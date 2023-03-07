@@ -13,14 +13,13 @@ TECHNOLOGIES USED:
 <a href="https://expo.dev/"><img src="https://res.cloudinary.com/crunchbase-production/image/upload/c_lpad,h_256,w_256,f_auto,q_auto:eco,dpr_1/q4q8emquy5eivdz4quk7" style="width: 64px; height: 64px" /></a>
 
 <h4 align="center"> 
-	🚧  dotLife 🚀 Will be uploaded to Google Play Store soon...  🚧
+	🚧  🚀 It will be uploaded to Google Play Store soon...  🚧
 </h4>
 
 ### Features
 
 - [x] Design
 - [x] Functionalities
-- [x] Database storage
 - [ ] Uploaded to Google Play Store
 
 ![video-sample](https://user-images.githubusercontent.com/65373130/222969800-e482ff02-5417-4fb0-aa64-f4e6251e77d3.gif)
