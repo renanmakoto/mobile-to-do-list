@@ -2,7 +2,7 @@
 
 <p align="center">A mobile To Do List I have developed using React Native. Not only did I develop this app for practising my skills, but also for my personal use.</p>
 
-<img src="https://img.shields.io/badge/os-Android-green" /> <img src="https://img.shields.io/badge/release-v1.0.0-blue" /> <a href="https://www.npmjs.com/"><img src="https://img.shields.io/badge/npm-v9.3.1-red" /></a> <a href="https://nodejs.org/en/"><img src="https://img.shields.io/badge/node.js-v.18.14.0-brightgreen" /></a> <img src="https://img.shields.io/badge/license-MIT-blue" />
+<img src="https://img.shields.io/badge/os-Android-green" /> <img src="https://img.shields.io/badge/release-v1.0.0-blue" /> <a href="https://www.npmjs.com/"><img src="https://img.shields.io/badge/npm-v9.3.1-red" /></a> <a href="https://nodejs.org/en/"><img src="https://img.shields.io/badge/node.js-v.18.14.0-brightgreen" /></a> <img src="https://img.shields.io/badge/license-MIT-blue" /> <img src="https://img.shields.io/badge/ReactNative-v0.71.4-blue" /> <img src="https://img.shields.io/badge/React-v18.2.0-blue" /> <img src="https://img.shields.io/badge/Expo-v48.0.5-white" />
 
 TECHNOLOGIES USED:
 
