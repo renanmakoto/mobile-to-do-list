@@ -30,7 +30,7 @@ TECHNOLOGIES USED:
 
 <div align="center">
 
-https://user-images.githubusercontent.com/65373130/232158460-5ed060a7-8512-4019-94e4-57d5556c44d1.gif
+![video-sample](https://user-images.githubusercontent.com/65373130/232158460-5ed060a7-8512-4019-94e4-57d5556c44d1.gif)
 
 </div>
 
