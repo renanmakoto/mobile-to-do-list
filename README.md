@@ -28,4 +28,7 @@ TECHNOLOGIES USED:
 
 </div>
 
+![to-do-list-mobile](https://user-images.githubusercontent.com/65373130/232157263-5386bc9a-fc2b-469f-926e-5e2f56cd0b82.gif)
+
+
 <p align="center">With ❤ by <img src=https://img.shields.io/badge/-dotExtension-black /> <p/>
