@@ -1,4 +1,4 @@
-<h1 align="center">Mobile To Do List</h1>
+<h1 align="center">toDot</h1>
 
 <p align="center">A mobile To Do List I have developed using React Native. Not only did I develop this app for practising my skills, but also for my personal use.</p>
 
