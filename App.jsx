@@ -41,7 +41,7 @@ export default function App() {
       </View>
       <StatusBar style="light" />
 
-      <Text style={styles.footer}>2023 - by renanMakoto</Text>
+      <Text style={styles.footer}>2023 - by dotExtension</Text>
     </View>
   )
 }
