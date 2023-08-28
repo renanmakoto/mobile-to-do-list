@@ -4,7 +4,7 @@ import React from 'react'
 export default function Header() {
   return (
     <View>
-      <Text style={ styles.title }>Mobile To Do List</Text>
+      <Text style={ styles.title }>toDot</Text>
     </View>
   )
 }
