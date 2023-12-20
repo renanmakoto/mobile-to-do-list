@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "to-do-list-mobile-app",
-    "slug": "to-do-list-mobile-app",
+    "name": "toDot",
+    "slug": "todot",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -31,8 +31,9 @@
     },
     "extra": {
       "eas": {
-        "projectId": "d04ad2e5-bf12-43a4-a18f-df8282d16996"
+        "projectId": "e3cbc491-f2e4-4ade-883a-96e406ee2d23"
       }
-    }
+    },
+    "owner": "renanmakoto"
   }
 }
