@@ -4,7 +4,7 @@
 
 <div align="center">
 
-<img src="https://img.shields.io/badge/os-Android-green" /> <img src="https://img.shields.io/badge/release-v1.0.0-blue" /> <a href="https://www.npmjs.com/"><img src="https://img.shields.io/badge/npm-v10.8.1-red" /></a> <a href="https://nodejs.org/en/"><img src="https://img.shields.io/badge/node.js-v.22.3.0-brightgreen" /></a> <img src="https://img.shields.io/badge/license-MIT-blue" /> <img src="https://img.shields.io/badge/ReactNative-v0.71.4-blue" /> <img src="https://img.shields.io/badge/React-v18.2.0-blue" /> <img src="https://img.shields.io/badge/Expo-v48.0.5-white" />
+<img src="https://img.shields.io/badge/os-Android-green" /> <img src="https://img.shields.io/badge/release-v1.0.0-blue" /> <a href="https://www.npmjs.com/"><img src="https://img.shields.io/badge/npm-v10.8.1-red" /></a> <a href="https://nodejs.org/en/"><img src="https://img.shields.io/badge/node.js-v.22.3.0-brightgreen" /></a> <img src="https://img.shields.io/badge/license-MIT-blue" /> <img src="https://img.shields.io/badge/ReactNative-v0.74.2-blue" /> <img src="https://img.shields.io/badge/React-v18.2.0-blue" /> <img src="https://img.shields.io/badge/Expo-v48.0.5-white" />
 
 <p>You may download the APK through the link below:</p>
 
