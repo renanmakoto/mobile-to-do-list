@@ -32,8 +32,6 @@ TECHNOLOGIES USED:
 
 ![2024-07-0113-03-46-ezgif com-crop](https://github.com/renanmakoto/mobile-to-do-list/assets/65373130/4dc051ff-4636-4784-8fdb-87a055a2207a)
 
-<img src="https://github.com/renanmakoto/mobile-to-do-list/assets/65373130/4dc051ff-4636-4784-8fdb-87a055a2207a" style="width: 500px; height: 500px;" />
-
 	
 </div>
 
