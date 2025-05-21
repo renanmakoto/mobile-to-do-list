@@ -1,6 +1,6 @@
 <h1 align="center">toDot</h1>
 
-<p align="center">A mobile To Do List I have developed using React Native for my personal use.</p>
+<p align="center">A mobile To Do List I developed using React Native for my personal use.</p>
 
 <div align="center">
 
