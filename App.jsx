@@ -29,6 +29,7 @@ export default function App() {
 
   return (
     <View style={styles.container}>
+      
       <FlatList
         data={data}
         keyExtractor={(item) => item.key}
