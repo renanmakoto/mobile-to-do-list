@@ -17,6 +17,7 @@ export default function Input({ submitHandler }) {
   return (
     <View>
       <View>
+          
         <TextInput 
             style={styles.input}
             placeholder="Add your task!"
