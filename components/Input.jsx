@@ -24,6 +24,7 @@ export default function Input({ submitHandler }) {
             value={value}
             onChangeText={onChangeText}
         />
+          
         <TouchableOpacity onPress={handleAddHabit} style={styles.button}>
             <Text style={styles.buttonText}>Add</Text>
         </TouchableOpacity>
