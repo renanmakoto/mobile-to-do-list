@@ -37,6 +37,7 @@ export default function App() {
         ListEmptyComponent={() => <Empty />}
         renderItem={({item}) => <Task item={item} deleteItem={deleteItem} />}
       />
+      
       <View>
         <Input submitHandler={submitHandler}/>
       </View>
