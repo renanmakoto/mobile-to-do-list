@@ -41,6 +41,7 @@ export default function App() {
       <View>
         <Input submitHandler={submitHandler}/>
       </View>
+      
       <StatusBar style="light" />
 
       <Text style={styles.footer}>2023 - by dotExtension | Renan Makoto</Text>
