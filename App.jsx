@@ -45,6 +45,7 @@ export default function App() {
       <StatusBar style="light" />
 
       <Text style={styles.footer}>2023 - by dotExtension | Renan Makoto</Text>
+      
     </View>
   )
 }
