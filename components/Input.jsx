@@ -28,6 +28,7 @@ export default function Input({ submitHandler }) {
         <TouchableOpacity onPress={handleAddHabit} style={styles.button}>
             <Text style={styles.buttonText}>Add</Text>
         </TouchableOpacity>
+          
       </View>
     </View>
   )
