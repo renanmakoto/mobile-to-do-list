@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, StyleSheet, Image } from "react-native"
 import React, { useState } from "react"
 
 export default function Task({ item, deleteItem }) {
-  const [check, setCheck] = useState(false);
+  const [check, setCheck] = useState(false)
 
   const handleCheck = () => {
     setCheck(!check);
