@@ -25,6 +25,7 @@ export default function Task({ item, deleteItem }) {
           />
         </TouchableOpacity>
       )}
+      
       <View>
         <Text style={ styles.taskTitle }>{ item.value }</Text>
       </View>
