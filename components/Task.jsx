@@ -6,7 +6,7 @@ export default function Task({ item, deleteItem }) {
 
   const handleCheck = () => {
     setCheck(!check)
-  };
+  }
 
   return (
     <View
