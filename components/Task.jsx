@@ -36,6 +36,7 @@ export default function Task({ item, deleteItem }) {
           source={ require("../assets/bin.png") }
         />
       </TouchableOpacity>
+      
     </View>
   )
 }
