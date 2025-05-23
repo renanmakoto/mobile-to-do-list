@@ -29,6 +29,7 @@ export default function Task({ item, deleteItem }) {
       <View>
         <Text style={ styles.taskTitle }>{ item.value }</Text>
       </View>
+      
       <TouchableOpacity onPress={ () => deleteItem(item.key) }>
         <Image
           style={ styles.iconImage }
