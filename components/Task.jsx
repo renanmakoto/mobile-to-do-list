@@ -5,7 +5,7 @@ export default function Task({ item, deleteItem }) {
   const [check, setCheck] = useState(false)
 
   const handleCheck = () => {
-    setCheck(!check);
+    setCheck(!check)
   };
 
   return (
