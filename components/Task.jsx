@@ -35,7 +35,7 @@ export default function Task({ item, deleteItem }) {
         />
       </TouchableOpacity>
     </View>
-  );
+  )
 }
 
 const styles = StyleSheet.create({
