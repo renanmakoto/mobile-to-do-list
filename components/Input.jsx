@@ -18,13 +18,6 @@ export default function Input({ submitHandler, editingTask, cancelEdit }) {
   const [showDatePicker, setShowDatePicker] = useState(false)
   const isEditing = Boolean(editingTask)
   const buttonLabel = isEditing ? "Update task" : "Save task"
-  const helperCopy = useMemo(
-    () =>
-      isEditing
-        ? 'Tip: Add "> clear" to remove a reminder while editing.'
-        : 'Tip: Add "> in 30m", "daily 08:00", or "@ next tue 09:30".',
-    [isEditing]
-  )
 
   useEffect(() => {
     if (editingTask) {
@@ -131,9 +124,6 @@ export default function Input({ submitHandler, editingTask, cancelEdit }) {
           returnKeyType="done"
           onSubmitEditing={handleSubmit}
         />
-        <TouchableOpacity onPress={handleSubmit} style={styles.addButton}>
-          <Text style={styles.addButtonText}>{buttonLabel}</Text>
-        </TouchableOpacity>
       </View>
 
       <View style={styles.timeRow}>
@@ -179,6 +169,10 @@ export default function Input({ submitHandler, editingTask, cancelEdit }) {
         )}
       </View>
 
+      <TouchableOpacity onPress={handleSubmit} style={styles.addButton}>
+        <Text style={styles.addButtonText}>{buttonLabel}</Text>
+      </TouchableOpacity>
+
       <Text style={styles.helperText}>{helperCopy}</Text>
     </View>
   )
@@ -208,15 +202,16 @@ const styles = StyleSheet.create({
   },
   inputRow: {
     flexDirection: "column",
-    borderBottomWidth: 1,
-    borderColor: "#858585",
-    paddingBottom: 8,
+    borderWidth: 1,
+    borderColor: "#00ADA2",
+    borderRadius: 10,
+    padding: 12,
   },
   input: {
     flex: 1,
     color: "#00ADA2",
     fontSize: 16,
-    paddingVertical: 12,
+    paddingVertical: 10,
   },
   timeRow: {
     marginTop: 16,
@@ -228,19 +223,24 @@ const styles = StyleSheet.create({
   },
   pickerSurface: {
     borderWidth: 1,
-    borderColor: "#858585",
-    borderRadius: 8,
+    borderColor: "#00ADA2",
+    borderRadius: 10,
     paddingVertical: 10,
     paddingHorizontal: 12,
+    backgroundColor: "#EFF9F8",
   },
   timeValue: {
     color: "#00ADA2",
     fontSize: 15,
   },
   addButton: {
-    alignSelf: "flex-start",
-    paddingVertical: 6,
-    marginTop: 8,
+    alignSelf: "center",
+    paddingVertical: 10,
+    marginTop: 12,
+    borderWidth: 1,
+    borderColor: "#00ADA2",
+    borderRadius: 10,
+    paddingHorizontal: 24,
   },
   addButtonText: {
     fontWeight: "600",
