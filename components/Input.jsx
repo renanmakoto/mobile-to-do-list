@@ -5,11 +5,16 @@ import {
   StyleSheet,
   TouchableOpacity,
   Keyboard,
+  Pressable,
+  Platform,
 } from "react-native"
 import React, { useEffect, useMemo, useState } from "react"
+import DateTimePicker from "@react-native-community/datetimepicker"
 
 export default function Input({ submitHandler, editingTask, cancelEdit }) {
   const [value, setValue] = useState("")
+  const [startTime, setStartTime] = useState(null)
+  const [showTimePicker, setShowTimePicker] = useState(false)
   const isEditing = Boolean(editingTask)
   const buttonLabel = isEditing ? "Update task" : "Save task"
   const helperCopy = useMemo(
@@ -23,10 +28,43 @@ export default function Input({ submitHandler, editingTask, cancelEdit }) {
   useEffect(() => {
     if (editingTask) {
       setValue(editingTask.value)
+      if (editingTask.remindAt) {
+        const date = new Date(editingTask.remindAt)
+        setStartTime(date)
+      } else {
+        setStartTime(null)
+      }
     } else {
       setValue("")
+      setStartTime(null)
     }
   }, [editingTask])
+
+  const formatTimeLabel = (date) => {
+    if (!date) return "Pick a time"
+    let hours = date.getHours()
+    const minutes = `${date.getMinutes()}`.padStart(2, "0")
+    const suffix = hours >= 12 ? "PM" : "AM"
+    hours = hours % 12 || 12
+    return `${`${hours}`.padStart(2, "0")}:${minutes} ${suffix}`
+  }
+
+  const formatTimeForSubmission = (date) => {
+    if (!date) return ""
+    const hours = `${date.getHours()}`.padStart(2, "0")
+    const minutes = `${date.getMinutes()}`.padStart(2, "0")
+    return `${hours}:${minutes}`
+  }
+
+  const handleTimeChange = (_event, selectedDate) => {
+    if (Platform.OS !== "ios") {
+      setShowTimePicker(false)
+    }
+    if (!selectedDate) {
+      return
+    }
+    setStartTime(selectedDate)
+  }
 
   const handleSubmit = async () => {
     if (!value.trim()) {
@@ -34,11 +72,16 @@ export default function Input({ submitHandler, editingTask, cancelEdit }) {
     }
 
     try {
-      await submitHandler(value, editingTask?.id || null)
+      const formattedTime = formatTimeForSubmission(startTime)
+      const composedValue = formattedTime
+        ? `${value} > ${formattedTime}`
+        : value
+      await submitHandler(composedValue, editingTask?.id || null)
     } finally {
       Keyboard.dismiss()
       if (!editingTask) {
         setValue("")
+        setStartTime(null)
       }
     }
   }
@@ -69,6 +112,25 @@ export default function Input({ submitHandler, editingTask, cancelEdit }) {
         <TouchableOpacity onPress={handleSubmit} style={styles.addButton}>
           <Text style={styles.addButtonText}>{buttonLabel}</Text>
         </TouchableOpacity>
+      </View>
+
+      <View style={styles.timeRow}>
+        <Text style={styles.timeLabel}>Start time</Text>
+        <Pressable
+          style={styles.timePicker}
+          onPress={() => setShowTimePicker(true)}
+        >
+          <Text style={styles.timeValue}>{formatTimeLabel(startTime)}</Text>
+        </Pressable>
+        {showTimePicker && (
+          <DateTimePicker
+            value={startTime || new Date()}
+            mode="time"
+            is24Hour={false}
+            display={Platform.OS === "ios" ? "spinner" : "default"}
+            onChange={handleTimeChange}
+          />
+        )}
       </View>
 
       <Text style={styles.helperText}>{helperCopy}</Text>
@@ -109,6 +171,25 @@ const styles = StyleSheet.create({
     color: "#00ADA2",
     fontSize: 16,
     paddingVertical: 12,
+  },
+  timeRow: {
+    marginTop: 16,
+  },
+  timeLabel: {
+    color: "#858585",
+    fontSize: 13,
+    marginBottom: 8,
+  },
+  timePicker: {
+    borderWidth: 1,
+    borderColor: "#858585",
+    borderRadius: 8,
+    paddingVertical: 10,
+    paddingHorizontal: 12,
+  },
+  timeValue: {
+    color: "#00ADA2",
+    fontSize: 15,
   },
   addButton: {
     alignSelf: "flex-start",
