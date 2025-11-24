@@ -656,7 +656,7 @@ export default function App() {
             )
           }
         />
-        <Text style={styles.footer}>2024 • dotExtension | Renan Makoto</Text>
+        <Text style={styles.footer}>2024 • dotExtension</Text>
       </SafeAreaView>
     </LinearGradient>
   )
