@@ -656,7 +656,7 @@ export default function App() {
             )
           }
         />
-        <Text style={styles.footer}>2024 • dotExtension</Text>
+        <Text style={styles.footer}>2025 • dotExtension</Text>
       </SafeAreaView>
     </LinearGradient>
   )
