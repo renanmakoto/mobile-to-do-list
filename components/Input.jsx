@@ -13,8 +13,9 @@ import DateTimePicker from "@react-native-community/datetimepicker"
 
 export default function Input({ submitHandler, editingTask, cancelEdit }) {
   const [value, setValue] = useState("")
-  const [startTime, setStartTime] = useState(null)
+  const [startDateTime, setStartDateTime] = useState(null)
   const [showTimePicker, setShowTimePicker] = useState(false)
+  const [showDatePicker, setShowDatePicker] = useState(false)
   const isEditing = Boolean(editingTask)
   const buttonLabel = isEditing ? "Update task" : "Save task"
   const helperCopy = useMemo(
@@ -30,15 +31,20 @@ export default function Input({ submitHandler, editingTask, cancelEdit }) {
       setValue(editingTask.value)
       if (editingTask.remindAt) {
         const date = new Date(editingTask.remindAt)
-        setStartTime(date)
+        setStartDateTime(date)
       } else {
-        setStartTime(null)
+        setStartDateTime(null)
       }
     } else {
       setValue("")
-      setStartTime(null)
+      setStartDateTime(null)
     }
   }, [editingTask])
+
+  const formatDateLabel = (date) => {
+    if (!date) return "Pick a date"
+    return date.toLocaleDateString()
+  }
 
   const formatTimeLabel = (date) => {
     if (!date) return "Pick a time"
@@ -49,13 +55,6 @@ export default function Input({ submitHandler, editingTask, cancelEdit }) {
     return `${`${hours}`.padStart(2, "0")}:${minutes} ${suffix}`
   }
 
-  const formatTimeForSubmission = (date) => {
-    if (!date) return ""
-    const hours = `${date.getHours()}`.padStart(2, "0")
-    const minutes = `${date.getMinutes()}`.padStart(2, "0")
-    return `${hours}:${minutes}`
-  }
-
   const handleTimeChange = (_event, selectedDate) => {
     if (Platform.OS !== "ios") {
       setShowTimePicker(false)
@@ -63,7 +62,27 @@ export default function Input({ submitHandler, editingTask, cancelEdit }) {
     if (!selectedDate) {
       return
     }
-    setStartTime(selectedDate)
+    const base = startDateTime || new Date()
+    const updated = new Date(base)
+    updated.setHours(selectedDate.getHours(), selectedDate.getMinutes(), 0, 0)
+    setStartDateTime(updated)
+  }
+
+  const handleDateChange = (_event, selectedDate) => {
+    if (Platform.OS !== "ios") {
+      setShowDatePicker(false)
+    }
+    if (!selectedDate) {
+      return
+    }
+    const base = startDateTime || new Date()
+    const updated = new Date(base)
+    updated.setFullYear(
+      selectedDate.getFullYear(),
+      selectedDate.getMonth(),
+      selectedDate.getDate()
+    )
+    setStartDateTime(updated)
   }
 
   const handleSubmit = async () => {
@@ -72,16 +91,19 @@ export default function Input({ submitHandler, editingTask, cancelEdit }) {
     }
 
     try {
-      const formattedTime = formatTimeForSubmission(startTime)
-      const composedValue = formattedTime
-        ? `${value} > ${formattedTime}`
-        : value
-      await submitHandler(composedValue, editingTask?.id || null)
+      const remindAtOverride = startDateTime
+        ? startDateTime.getTime()
+        : null
+      await submitHandler(
+        value,
+        editingTask?.id || null,
+        remindAtOverride
+      )
     } finally {
       Keyboard.dismiss()
       if (!editingTask) {
         setValue("")
-        setStartTime(null)
+        setStartDateTime(null)
       }
     }
   }
@@ -115,16 +137,37 @@ export default function Input({ submitHandler, editingTask, cancelEdit }) {
       </View>
 
       <View style={styles.timeRow}>
+        <Text style={styles.timeLabel}>Start date</Text>
+        <Pressable
+          style={styles.pickerSurface}
+          onPress={() => setShowDatePicker(true)}
+        >
+          <Text style={styles.timeValue}>{formatDateLabel(startDateTime)}</Text>
+        </Pressable>
+        {showDatePicker && (
+          <DateTimePicker
+            value={startDateTime || new Date()}
+            mode="date"
+            display={Platform.OS === "ios" ? "spinner" : "default"}
+            onChange={handleDateChange}
+            themeVariant="light"
+            textColor="#00ADA2"
+            accentColor="#00ADA2"
+          />
+        )}
+      </View>
+
+      <View style={styles.timeRow}>
         <Text style={styles.timeLabel}>Start time</Text>
         <Pressable
-          style={styles.timePicker}
+          style={styles.pickerSurface}
           onPress={() => setShowTimePicker(true)}
         >
-          <Text style={styles.timeValue}>{formatTimeLabel(startTime)}</Text>
+          <Text style={styles.timeValue}>{formatTimeLabel(startDateTime)}</Text>
         </Pressable>
         {showTimePicker && (
           <DateTimePicker
-            value={startTime || new Date()}
+            value={startDateTime || new Date()}
             mode="time"
             is24Hour={false}
             display={Platform.OS === "ios" ? "spinner" : "default"}
@@ -183,7 +226,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     marginBottom: 8,
   },
-  timePicker: {
+  pickerSurface: {
     borderWidth: 1,
     borderColor: "#858585",
     borderRadius: 8,

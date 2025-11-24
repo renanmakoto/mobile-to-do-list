@@ -473,21 +473,27 @@ export const useTaskManager = () => {
   )
 
   const submitHandler = useCallback(
-    async (rawValue, editingId = null) => {
+    async (rawValue, editingId = null, remindAtOverride = null) => {
       const { cleanedText, remindAt, repeat, instructionMatched } =
         parseReminderTokens(rawValue)
       const trimmedValue = cleanedText.trim()
       if (!trimmedValue) {
         return
       }
-      const normalizedRemindAt = normalizeRemindAt(remindAt)
+      const normalizedOverride = normalizeRemindAt(remindAtOverride)
+      const normalizedRemindAt =
+        normalizedOverride != null
+          ? normalizedOverride
+          : normalizeRemindAt(remindAt)
+      const matched = instructionMatched || normalizedOverride != null
+
       if (editingId) {
         await handleUpdateTask({
           taskId: editingId,
           nextValue: trimmedValue,
           nextRemindAtRaw: normalizedRemindAt,
           nextRepeatRaw: repeat ?? null,
-          instructionMatched,
+          instructionMatched: matched,
         })
         return
       }
