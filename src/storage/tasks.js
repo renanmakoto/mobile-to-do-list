@@ -40,7 +40,7 @@ const mapRowToTask = (row) => ({
 
 const runInit = async () => {
   const db = await getDb()
-  await db.execAsync("PRAGMA journal_mode = WAL;")
+  await db.execAsync("PRAGMA journal_mode = WAL")
   await db.runAsync(
     `CREATE TABLE IF NOT EXISTS ${TABLE_TASKS} (
       id TEXT PRIMARY KEY NOT NULL,
