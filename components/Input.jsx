@@ -173,7 +173,6 @@ export default function Input({ submitHandler, editingTask, cancelEdit }) {
         <Text style={styles.addButtonText}>{buttonLabel}</Text>
       </TouchableOpacity>
 
-      <Text style={styles.helperText}>{helperCopy}</Text>
     </View>
   )
 }
@@ -247,11 +246,5 @@ const styles = StyleSheet.create({
     color: "#00ADA2",
     fontSize: 15,
     letterSpacing: 0.4,
-  },
-  helperText: {
-    marginTop: 14,
-    color: "#858585",
-    fontSize: 13,
-    lineHeight: 18,
   },
 })

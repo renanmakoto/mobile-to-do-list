@@ -13,7 +13,7 @@ const formatToday = () => {
 export default function Header({ totalTasks = 0, remindersCount = 0 }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.kicker}>Today</Text>
+      <Text style={styles.kicker}></Text>
       <Text style={styles.title}>toDot</Text>
       <Text style={styles.subtitle}></Text>
 
