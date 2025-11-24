@@ -129,6 +129,9 @@ export default function Input({ submitHandler, editingTask, cancelEdit }) {
             is24Hour={false}
             display={Platform.OS === "ios" ? "spinner" : "default"}
             onChange={handleTimeChange}
+            themeVariant="light"
+            textColor="#00ADA2"
+            accentColor="#00ADA2"
           />
         )}
       </View>
