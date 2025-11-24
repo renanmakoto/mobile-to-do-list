@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   kicker: {
-    color: "#93c5fd",
+    color: "#EFF9F8",
     textTransform: "uppercase",
     fontSize: 12,
     letterSpacing: 2,
@@ -49,11 +49,11 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 34,
-    color: "#f8fafc",
+    color: "#EFF9F8",
     fontWeight: "700",
   },
   subtitle: {
-    color: "#cbd5f5",
+    color: "#EFF9F8",
     marginTop: 6,
     fontSize: 15,
     lineHeight: 21,
@@ -67,8 +67,8 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: "rgba(148, 163, 184, 0.3)",
-    backgroundColor: "rgba(23, 37, 84, 0.45)",
+    borderColor: "#EFF9F8",
+    backgroundColor: "#EFF9F8",
   },
   metaCardLeft: {
     marginRight: 12,
@@ -77,13 +77,13 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   metaValue: {
-    color: "#f8fafc",
+    color: "#00ADA2",
     fontSize: 22,
     fontWeight: "700",
     textAlign: "center",
   },
   metaLabel: {
-    color: "#94a3b8",
+    color: "#858585",
     fontSize: 12,
     letterSpacing: 1,
     textAlign: "center",
@@ -92,7 +92,7 @@ const styles = StyleSheet.create({
   },
   date: {
     marginTop: 28,
-    color: "#94a3b8",
+    color: "#EFF9F8",
     fontSize: 13,
     letterSpacing: 0.6,
   },

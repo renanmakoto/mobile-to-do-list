@@ -600,7 +600,7 @@ export default function App() {
 
   return (
     <LinearGradient
-      colors={["#0f172a", "#1d2f4f", "#040617"]}
+      colors={["#00ADA2", "#00ADA2", "#858585"]}
       style={styles.gradient}
     >
       <SafeAreaView style={styles.safeArea}>
@@ -649,7 +649,7 @@ export default function App() {
           ListEmptyComponent={
             loadingTasks ? (
               <View style={styles.loader}>
-                <ActivityIndicator size="small" color="#cbd5f5" />
+                <ActivityIndicator size="small" color="#EFF9F8" />
               </View>
             ) : (
               <Empty />
@@ -682,7 +682,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   sectionTitle: {
-    color: "#cbd5f5",
+    color: "#EFF9F8",
     fontSize: 13,
     fontWeight: "600",
     textTransform: "uppercase",
@@ -694,7 +694,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   footer: {
-    color: "#64748b",
+    color: "#EFF9F8",
     textAlign: "center",
     paddingVertical: 18,
     fontSize: 12,

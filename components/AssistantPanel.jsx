@@ -10,7 +10,7 @@ export default function AssistantPanel({
   return (
     <View style={styles.card}>
       <View style={styles.headerRow}>
-        <Ionicons name="sparkles-outline" size={20} color="#f472b6" />
+        <Ionicons name="sparkles-outline" size={20} color="#00ADA2" />
         <Text style={styles.greeting}>{greeting}</Text>
       </View>
       <Text style={styles.summary}>{summary}</Text>
@@ -28,7 +28,7 @@ export default function AssistantPanel({
               <Ionicons
                 name={suggestion.icon || "bulb-outline"}
                 size={18}
-                color="#fbcfe8"
+                color="#00ADA2"
               />
               <Text style={styles.listText}>{suggestion.label}</Text>
             </View>
@@ -43,9 +43,9 @@ const styles = StyleSheet.create({
   card: {
     borderRadius: 20,
     padding: 18,
-    backgroundColor: "rgba(99, 102, 241, 0.18)",
+    backgroundColor: "#EFF9F8",
     borderWidth: 1,
-    borderColor: "rgba(129, 140, 248, 0.35)",
+    borderColor: "#858585",
     marginBottom: 20,
   },
   headerRow: {
@@ -54,13 +54,13 @@ const styles = StyleSheet.create({
   },
   greeting: {
     marginLeft: 10,
-    color: "#f8fafc",
+    color: "#00ADA2",
     fontSize: 16,
     fontWeight: "600",
   },
   summary: {
     marginTop: 12,
-    color: "#e0e7ff",
+    color: "#858585",
     lineHeight: 20,
     fontSize: 14,
   },
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
   },
   listText: {
     marginLeft: 10,
-    color: "#e0e7ff",
+    color: "#858585",
     fontSize: 13,
     flex: 1,
   },

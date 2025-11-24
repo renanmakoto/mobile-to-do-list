@@ -58,11 +58,11 @@ export default function Input({ submitHandler, editingTask, cancelEdit }) {
       </View>
 
       <View style={styles.inputRow}>
-        <Ionicons name="sparkles-outline" size={20} color="#60a5fa" />
+        <Ionicons name="sparkles-outline" size={20} color="#00ADA2" />
         <TextInput
           style={styles.input}
           placeholder="Describe what needs to happen..."
-          placeholderTextColor="#9ca3af"
+          placeholderTextColor="#858585"
           value={value}
           onChangeText={setValue}
           returnKeyType="done"
@@ -71,7 +71,7 @@ export default function Input({ submitHandler, editingTask, cancelEdit }) {
       </View>
 
       <TouchableOpacity onPress={handleSubmit} style={styles.addButton}>
-        <Ionicons name="add-circle-outline" size={20} color="#0f172a" />
+        <Ionicons name="add-circle-outline" size={20} color="#EFF9F8" />
         <Text style={styles.addButtonText}>{buttonLabel}</Text>
       </TouchableOpacity>
 
@@ -83,19 +83,19 @@ export default function Input({ submitHandler, editingTask, cancelEdit }) {
 const styles = StyleSheet.create({
   card: {
     borderRadius: 20,
-    backgroundColor: "rgba(15, 23, 42, 0.8)",
+    backgroundColor: "#EFF9F8",
     borderWidth: 1,
-    borderColor: "rgba(148, 163, 184, 0.25)",
+    borderColor: "#858585",
     padding: 20,
     marginBottom: 32,
-    shadowColor: "#000",
+    shadowColor: "#858585",
     shadowOpacity: 0.25,
     shadowOffset: { width: 0, height: 12 },
     shadowRadius: 24,
     elevation: 6,
   },
   cardTitle: {
-    color: "#e2e8f0",
+    color: "#00ADA2",
     fontSize: 16,
     fontWeight: "600",
     marginBottom: 16,
@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   cancelLink: {
-    color: "#f87171",
+    color: "#858585",
     fontSize: 14,
     fontWeight: "500",
   },
@@ -116,13 +116,13 @@ const styles = StyleSheet.create({
     alignItems: "center",
     borderRadius: 14,
     borderWidth: 1,
-    borderColor: "rgba(148, 163, 184, 0.3)",
+    borderColor: "#00ADA2",
     paddingHorizontal: 14,
-    backgroundColor: "rgba(15, 23, 42, 0.65)",
+    backgroundColor: "#EFF9F8",
   },
   input: {
     flex: 1,
-    color: "#f8fafc",
+    color: "#858585",
     fontSize: 16,
     paddingVertical: 12,
     marginLeft: 10,
@@ -133,19 +133,19 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     marginTop: 18,
     borderRadius: 14,
-    backgroundColor: "#60a5fa",
+    backgroundColor: "#00ADA2",
     paddingVertical: 12,
   },
   addButtonText: {
     fontWeight: "600",
-    color: "#0f172a",
+    color: "#EFF9F8",
     fontSize: 15,
     letterSpacing: 0.4,
     marginLeft: 8,
   },
   helperText: {
     marginTop: 14,
-    color: "#94a3b8",
+    color: "#858585",
     fontSize: 13,
     lineHeight: 18,
   },

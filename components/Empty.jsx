@@ -5,7 +5,7 @@ import { Ionicons } from "@expo/vector-icons"
 export default function Empty() {
   return (
     <View style={styles.container}>
-      <Ionicons name="sparkles-outline" size={48} color="#94a3b8" />
+      <Ionicons name="sparkles-outline" size={48} color="#00ADA2" />
       <Text style={styles.title}>You are all caught up</Text>
       <Text style={styles.subtitle}>
         Add a task above and set a reminder to keep momentum.
@@ -21,13 +21,13 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   title: {
-    color: "#e2e8f0",
+    color: "#EFF9F8",
     fontSize: 18,
     fontWeight: "600",
     marginTop: 12,
   },
   subtitle: {
-    color: "#94a3b8",
+    color: "#EFF9F8",
     fontSize: 14,
     textAlign: "center",
     lineHeight: 20,

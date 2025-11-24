@@ -56,7 +56,9 @@ export default function Task({
         style={styles.checkboxWrapper}
       >
         <View style={[styles.checkbox, completed && styles.checkboxOn]}>
-          {completed && <Ionicons name="checkmark" size={16} color="#0f172a" />}
+          {completed && (
+            <Ionicons name="checkmark" size={16} color="#EFF9F8" />
+          )}
         </View>
       </TouchableOpacity>
 
@@ -69,7 +71,7 @@ export default function Task({
             <Ionicons
               name="time-outline"
               size={14}
-              color={isOverdue ? "#fca5a5" : "#bfdbfe"}
+              color={isOverdue ? "#858585" : "#00ADA2"}
             />
             <Text
               style={[
@@ -91,13 +93,13 @@ export default function Task({
             onPress={() => onEdit?.(item.id)}
             style={styles.iconButton}
           >
-            <Ionicons name="create-outline" size={18} color="#c7d2fe" />
+            <Ionicons name="create-outline" size={18} color="#00ADA2" />
           </TouchableOpacity>
           <TouchableOpacity
             onPress={() => deleteItem(item.id)}
             style={styles.iconButton}
           >
-            <Ionicons name="trash-outline" size={18} color="#fca5a5" />
+            <Ionicons name="trash-outline" size={18} color="#858585" />
           </TouchableOpacity>
         </View>
         <View style={styles.reorderColumn}>
@@ -112,7 +114,7 @@ export default function Task({
             <Ionicons
               name="chevron-up-outline"
               size={16}
-              color="#cbd5f5"
+              color="#00ADA2"
             />
           </TouchableOpacity>
           <TouchableOpacity
@@ -127,7 +129,7 @@ export default function Task({
             <Ionicons
               name="chevron-down-outline"
               size={16}
-              color="#cbd5f5"
+              color="#00ADA2"
             />
           </TouchableOpacity>
         </View>
@@ -143,14 +145,14 @@ const styles = StyleSheet.create({
     borderRadius: 18,
     paddingVertical: 18,
     paddingHorizontal: 18,
-    backgroundColor: "rgba(15, 23, 42, 0.85)",
+    backgroundColor: "#EFF9F8",
     borderWidth: 1,
-    borderColor: "rgba(148, 163, 184, 0.25)",
+    borderColor: "#858585",
     marginBottom: 16,
   },
   cardChecked: {
     opacity: 0.65,
-    borderColor: "rgba(96, 165, 250, 0.35)",
+    borderColor: "#00ADA2",
   },
   checkboxWrapper: {
     padding: 4,
@@ -161,25 +163,25 @@ const styles = StyleSheet.create({
     width: 26,
     borderRadius: 8,
     borderWidth: 2,
-    borderColor: "#60a5fa",
+    borderColor: "#00ADA2",
     alignItems: "center",
     justifyContent: "center",
   },
   checkboxOn: {
-    backgroundColor: "#60a5fa",
+    backgroundColor: "#00ADA2",
   },
   content: {
     flex: 1,
     marginRight: 12,
   },
   title: {
-    color: "#e2e8f0",
+    color: "#00ADA2",
     fontSize: 16,
     fontWeight: "600",
   },
   titleChecked: {
     textDecorationLine: "line-through",
-    color: "#94a3b8",
+    color: "#858585",
   },
   metaRow: {
     flexDirection: "row",
@@ -187,16 +189,17 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   metaText: {
-    color: "#bfdbfe",
+    color: "#858585",
     fontSize: 13,
     letterSpacing: 0.3,
     marginLeft: 6,
   },
   metaTextOverdue: {
-    color: "#fca5a5",
+    color: "#00ADA2",
   },
   metaTextCompleted: {
-    color: "#94a3b8",
+    color: "#858585",
+    opacity: 0.7,
   },
   actionsColumn: {
     marginLeft: 12,
