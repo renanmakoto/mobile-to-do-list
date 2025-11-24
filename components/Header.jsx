@@ -15,9 +15,7 @@ export default function Header({ totalTasks = 0, remindersCount = 0 }) {
     <View style={styles.container}>
       <Text style={styles.kicker}>Today</Text>
       <Text style={styles.title}>Mobile To-Do</Text>
-      <Text style={styles.subtitle}>
-        Keep track of everything important in one place.
-      </Text>
+      <Text style={styles.subtitle}></Text>
 
       <View style={styles.metaRow}>
         <View style={styles.metaCard}>
