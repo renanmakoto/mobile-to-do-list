@@ -43,12 +43,7 @@ const buildAssistantInsights = (tasks = []) => {
     return {
       greeting,
       summary: "",
-      suggestions: [
-        {
-          id: "first-task",
-          label: 'Try "Plan sprint retro > next fri 15:00" to auto-set a reminder.',
-        },
-      ],
+      suggestions: [],
     }
   }
 
