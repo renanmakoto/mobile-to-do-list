@@ -7,7 +7,6 @@ import {
   Keyboard,
 } from "react-native"
 import React, { useEffect, useMemo, useState } from "react"
-import { Ionicons } from "@expo/vector-icons"
 
 export default function Input({ submitHandler, editingTask, cancelEdit }) {
   const [value, setValue] = useState("")
@@ -58,7 +57,6 @@ export default function Input({ submitHandler, editingTask, cancelEdit }) {
       </View>
 
       <View style={styles.inputRow}>
-        <Ionicons name="sparkles-outline" size={20} color="#00ADA2" />
         <TextInput
           style={styles.input}
           placeholder="Describe what needs to happen..."
@@ -68,12 +66,10 @@ export default function Input({ submitHandler, editingTask, cancelEdit }) {
           returnKeyType="done"
           onSubmitEditing={handleSubmit}
         />
+        <TouchableOpacity onPress={handleSubmit} style={styles.addButton}>
+          <Text style={styles.addButtonText}>{buttonLabel}</Text>
+        </TouchableOpacity>
       </View>
-
-      <TouchableOpacity onPress={handleSubmit} style={styles.addButton}>
-        <Ionicons name="add-circle-outline" size={20} color="#EFF9F8" />
-        <Text style={styles.addButtonText}>{buttonLabel}</Text>
-      </TouchableOpacity>
 
       <Text style={styles.helperText}>{helperCopy}</Text>
     </View>
@@ -82,20 +78,11 @@ export default function Input({ submitHandler, editingTask, cancelEdit }) {
 
 const styles = StyleSheet.create({
   card: {
-    borderRadius: 20,
-    backgroundColor: "#EFF9F8",
-    borderWidth: 1,
-    borderColor: "#858585",
-    padding: 20,
+    paddingVertical: 16,
     marginBottom: 32,
-    shadowColor: "#858585",
-    shadowOpacity: 0.25,
-    shadowOffset: { width: 0, height: 12 },
-    shadowRadius: 24,
-    elevation: 6,
   },
   cardTitle: {
-    color: "#00ADA2",
+    color: "#858585",
     fontSize: 16,
     fontWeight: "600",
     marginBottom: 16,
@@ -107,41 +94,32 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   cancelLink: {
-    color: "#858585",
+    color: "#00ADA2",
     fontSize: 14,
     fontWeight: "500",
   },
   inputRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderRadius: 14,
-    borderWidth: 1,
-    borderColor: "#00ADA2",
-    paddingHorizontal: 14,
-    backgroundColor: "#EFF9F8",
+    flexDirection: "column",
+    borderBottomWidth: 1,
+    borderColor: "#858585",
+    paddingBottom: 8,
   },
   input: {
     flex: 1,
-    color: "#858585",
+    color: "#00ADA2",
     fontSize: 16,
     paddingVertical: 12,
-    marginLeft: 10,
   },
   addButton: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginTop: 18,
-    borderRadius: 14,
-    backgroundColor: "#00ADA2",
-    paddingVertical: 12,
+    alignSelf: "flex-start",
+    paddingVertical: 6,
+    marginTop: 8,
   },
   addButtonText: {
     fontWeight: "600",
-    color: "#EFF9F8",
+    color: "#00ADA2",
     fontSize: 15,
     letterSpacing: 0.4,
-    marginLeft: 8,
   },
   helperText: {
     marginTop: 14,

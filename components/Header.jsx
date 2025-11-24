@@ -13,18 +13,18 @@ const formatToday = () => {
 export default function Header({ totalTasks = 0, remindersCount = 0 }) {
   return (
     <View style={styles.container}>
-      <Text style={styles.kicker}>Plan your day</Text>
+      <Text style={styles.kicker}>Today</Text>
       <Text style={styles.title}>Mobile To-Do</Text>
       <Text style={styles.subtitle}>
         Keep track of everything important in one place.
       </Text>
 
       <View style={styles.metaRow}>
-        <View style={[styles.metaCard, styles.metaCardLeft]}>
+        <View style={styles.metaCard}>
           <Text style={styles.metaValue}>{totalTasks}</Text>
           <Text style={styles.metaLabel}>Tasks</Text>
         </View>
-        <View style={[styles.metaCard, styles.metaCardRight]}>
+        <View style={styles.metaCard}>
           <Text style={styles.metaValue}>{remindersCount}</Text>
           <Text style={styles.metaLabel}>Reminders</Text>
         </View>
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   kicker: {
-    color: "#EFF9F8",
+    color: "#858585",
     textTransform: "uppercase",
     fontSize: 12,
     letterSpacing: 2,
@@ -49,11 +49,11 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 34,
-    color: "#EFF9F8",
+    color: "#00ADA2",
     fontWeight: "700",
   },
   subtitle: {
-    color: "#EFF9F8",
+    color: "#858585",
     marginTop: 6,
     fontSize: 15,
     lineHeight: 21,
@@ -61,20 +61,11 @@ const styles = StyleSheet.create({
   metaRow: {
     flexDirection: "row",
     marginTop: 28,
+    justifyContent: "space-between",
   },
   metaCard: {
     flex: 1,
-    paddingVertical: 16,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: "#EFF9F8",
-    backgroundColor: "#EFF9F8",
-  },
-  metaCardLeft: {
-    marginRight: 12,
-  },
-  metaCardRight: {
-    marginLeft: 12,
+    paddingVertical: 4,
   },
   metaValue: {
     color: "#00ADA2",
@@ -92,7 +83,7 @@ const styles = StyleSheet.create({
   },
   date: {
     marginTop: 28,
-    color: "#EFF9F8",
+    color: "#858585",
     fontSize: 13,
     letterSpacing: 0.6,
   },

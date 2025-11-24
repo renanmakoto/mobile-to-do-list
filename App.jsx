@@ -1,5 +1,4 @@
 import { StatusBar } from "expo-status-bar"
-import { LinearGradient } from "expo-linear-gradient"
 import * as Notifications from "expo-notifications"
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import {
@@ -599,75 +598,65 @@ export default function App() {
   }, [handleSnoozeTask, handleToggleComplete, hydrateTasksAsync])
 
   return (
-    <LinearGradient
-      colors={["#00ADA2", "#00ADA2", "#858585"]}
-      style={styles.gradient}
-    >
-      <SafeAreaView style={styles.safeArea}>
-        <StatusBar style="light" />
-        <FlatList
-          data={tasks}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item, index }) => (
-            <Task
-              item={item}
-              deleteItem={handleDeleteTask}
-              toggleComplete={handleToggleComplete}
-              onEdit={setEditingTaskId}
-              onMoveUp={handleMoveUp}
-              onMoveDown={handleMoveDown}
-              disableMoveUp={index === 0}
-              disableMoveDown={index === tasks.length - 1}
+    <SafeAreaView style={styles.safeArea}>
+      <StatusBar style="dark" />
+      <FlatList
+        data={tasks}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item, index }) => (
+          <Task
+            item={item}
+            deleteItem={handleDeleteTask}
+            toggleComplete={handleToggleComplete}
+            onEdit={setEditingTaskId}
+            onMoveUp={handleMoveUp}
+            onMoveDown={handleMoveDown}
+            disableMoveUp={index === 0}
+            disableMoveDown={index === tasks.length - 1}
+          />
+        )}
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={[
+          styles.listContent,
+          tasks.length === 0 && styles.listContentEmpty,
+        ]}
+        ListHeaderComponent={
+          <View style={styles.listHeader}>
+            <Header totalTasks={tasks.length} remindersCount={reminderCount} />
+            <AssistantPanel
+              greeting={assistantInsights.greeting}
+              summary={assistantInsights.summary}
+              suggestions={assistantInsights.suggestions}
             />
-          )}
-          showsVerticalScrollIndicator={false}
-          contentContainerStyle={[
-            styles.listContent,
-            tasks.length === 0 && styles.listContentEmpty,
-          ]}
-          ListHeaderComponent={
-            <View style={styles.listHeader}>
-              <Header
-                totalTasks={tasks.length}
-                remindersCount={reminderCount}
-              />
-              <AssistantPanel
-                greeting={assistantInsights.greeting}
-                summary={assistantInsights.summary}
-                suggestions={assistantInsights.suggestions}
-              />
-              <Input
-                submitHandler={submitHandler}
-                editingTask={editingTask}
-                cancelEdit={() => setEditingTaskId(null)}
-              />
-              {tasks.length > 0 && (
-                <Text style={styles.sectionTitle}>Your tasks</Text>
-              )}
+            <Input
+              submitHandler={submitHandler}
+              editingTask={editingTask}
+              cancelEdit={() => setEditingTaskId(null)}
+            />
+            {tasks.length > 0 && (
+              <Text style={styles.sectionTitle}>Your tasks</Text>
+            )}
+          </View>
+        }
+        ListEmptyComponent={
+          loadingTasks ? (
+            <View style={styles.loader}>
+              <ActivityIndicator size="small" color="#00ADA2" />
             </View>
-          }
-          ListEmptyComponent={
-            loadingTasks ? (
-              <View style={styles.loader}>
-                <ActivityIndicator size="small" color="#EFF9F8" />
-              </View>
-            ) : (
-              <Empty />
-            )
-          }
-        />
-        <Text style={styles.footer}>2025 • dotExtension</Text>
-      </SafeAreaView>
-    </LinearGradient>
+          ) : (
+            <Empty />
+          )
+        }
+      />
+      <Text style={styles.footer}>2025 • dotExtension</Text>
+    </SafeAreaView>
   )
 }
 
 const styles = StyleSheet.create({
-  gradient: {
-    flex: 1,
-  },
   safeArea: {
     flex: 1,
+    backgroundColor: "#EFF9F8",
   },
   listContent: {
     paddingHorizontal: 24,
@@ -682,7 +671,7 @@ const styles = StyleSheet.create({
     paddingBottom: 8,
   },
   sectionTitle: {
-    color: "#EFF9F8",
+    color: "#858585",
     fontSize: 13,
     fontWeight: "600",
     textTransform: "uppercase",
@@ -694,7 +683,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   footer: {
-    color: "#EFF9F8",
+    color: "#858585",
     textAlign: "center",
     paddingVertical: 18,
     fontSize: 12,

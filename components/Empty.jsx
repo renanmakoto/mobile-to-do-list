@@ -1,14 +1,12 @@
 import { View, Text, StyleSheet } from "react-native"
 import React from "react"
-import { Ionicons } from "@expo/vector-icons"
 
 export default function Empty() {
   return (
     <View style={styles.container}>
-      <Ionicons name="sparkles-outline" size={48} color="#00ADA2" />
-      <Text style={styles.title}>You are all caught up</Text>
+      <Text style={styles.title}>Nothing scheduled</Text>
       <Text style={styles.subtitle}>
-        Add a task above and set a reminder to keep momentum.
+        Add your first task to get started.
       </Text>
     </View>
   )
@@ -21,17 +19,16 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   title: {
-    color: "#EFF9F8",
+    color: "#00ADA2",
     fontSize: 18,
     fontWeight: "600",
-    marginTop: 12,
   },
   subtitle: {
-    color: "#EFF9F8",
+    color: "#858585",
     fontSize: 14,
     textAlign: "center",
     lineHeight: 20,
     paddingHorizontal: 24,
-    marginTop: 6,
+    marginTop: 12,
   },
 })

@@ -71,7 +71,7 @@ export default function Task({
             <Ionicons
               name="time-outline"
               size={14}
-              color={isOverdue ? "#858585" : "#00ADA2"}
+              color={isOverdue ? "#00ADA2" : "#858585"}
             />
             <Text
               style={[
@@ -111,11 +111,7 @@ export default function Task({
               disableMoveUp && styles.iconButtonDisabled,
             ]}
           >
-            <Ionicons
-              name="chevron-up-outline"
-              size={16}
-              color="#00ADA2"
-            />
+            <Ionicons name="chevron-up-outline" size={16} color="#858585" />
           </TouchableOpacity>
           <TouchableOpacity
             disabled={disableMoveDown}
@@ -126,11 +122,7 @@ export default function Task({
               disableMoveDown && styles.iconButtonDisabled,
             ]}
           >
-            <Ionicons
-              name="chevron-down-outline"
-              size={16}
-              color="#00ADA2"
-            />
+            <Ionicons name="chevron-down-outline" size={16} color="#858585" />
           </TouchableOpacity>
         </View>
       </View>
@@ -142,32 +134,28 @@ const styles = StyleSheet.create({
   card: {
     flexDirection: "row",
     alignItems: "center",
-    borderRadius: 18,
-    paddingVertical: 18,
-    paddingHorizontal: 18,
-    backgroundColor: "#EFF9F8",
-    borderWidth: 1,
-    borderColor: "#858585",
-    marginBottom: 16,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: "#858585",
   },
   cardChecked: {
-    opacity: 0.65,
-    borderColor: "#00ADA2",
+    opacity: 0.5,
   },
   checkboxWrapper: {
     padding: 4,
-    marginRight: 16,
+    marginRight: 12,
   },
   checkbox: {
-    height: 26,
-    width: 26,
-    borderRadius: 8,
+    height: 24,
+    width: 24,
+    borderRadius: 6,
     borderWidth: 2,
-    borderColor: "#00ADA2",
+    borderColor: "#858585",
     alignItems: "center",
     justifyContent: "center",
   },
   checkboxOn: {
+    borderColor: "#00ADA2",
     backgroundColor: "#00ADA2",
   },
   content: {
