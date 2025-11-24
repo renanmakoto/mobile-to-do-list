@@ -14,7 +14,7 @@ export default function Header({ totalTasks = 0, remindersCount = 0 }) {
   return (
     <View style={styles.container}>
       <Text style={styles.kicker}>Today</Text>
-      <Text style={styles.title}>Mobile To-Do</Text>
+      <Text style={styles.title}>toDot</Text>
       <Text style={styles.subtitle}></Text>
 
       <View style={styles.metaRow}>
