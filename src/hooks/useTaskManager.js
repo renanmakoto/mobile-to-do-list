@@ -42,7 +42,7 @@ const buildAssistantInsights = (tasks = []) => {
   if (tasks.length === 0) {
     return {
       greeting,
-      summary: "Nothing in the plan yet. Add your first task and I'll remind you.",
+      summary: "",
       suggestions: [
         {
           id: "first-task",
