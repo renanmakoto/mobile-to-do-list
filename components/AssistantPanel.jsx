@@ -1,21 +1,28 @@
-import React from "react"
-import { View, Text, StyleSheet } from "react-native"
+import React from 'react'
+import { StyleSheet, Text, View } from 'react-native'
+
+import { COLORS } from '../src/constants'
+import { FONT_SIZES, SPACING } from './styles'
+
+const SuggestionItem = ({ label }) => (
+  <Text style={styles.suggestionText}>• {label}</Text>
+)
 
 export default function AssistantPanel({
-  greeting,
-  summary,
+  greeting = '',
+  summary = '',
   suggestions = [],
 }) {
   return (
     <View style={styles.container}>
       <Text style={styles.greeting}>{greeting}</Text>
-      <Text style={styles.summary}>{summary}</Text>
+
+      {summary && <Text style={styles.summary}>{summary}</Text>}
+
       {suggestions.length > 0 && (
-        <View style={styles.list}>
+        <View style={styles.suggestionsList}>
           {suggestions.map((suggestion) => (
-            <Text key={suggestion.id} style={styles.listText}>
-              • {suggestion.label}
-            </Text>
+            <SuggestionItem key={suggestion.id} label={suggestion.label} />
           ))}
         </View>
       )}
@@ -25,26 +32,26 @@ export default function AssistantPanel({
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 24,
+    marginBottom: SPACING.xl,
   },
   greeting: {
-    color: "#00ADA2",
-    fontSize: 16,
-    fontWeight: "600",
+    color: COLORS.primary,
+    fontSize: FONT_SIZES.xl,
+    fontWeight: '600',
   },
   summary: {
-    marginTop: 8,
-    color: "#858585",
+    marginTop: SPACING.sm,
+    color: COLORS.textSecondary,
     lineHeight: 20,
-    fontSize: 14,
+    fontSize: FONT_SIZES.md,
   },
-  list: {
-    marginTop: 12,
+  suggestionsList: {
+    marginTop: SPACING.md,
   },
-  listText: {
-    color: "#858585",
-    fontSize: 13,
+  suggestionText: {
+    color: COLORS.textSecondary,
+    fontSize: FONT_SIZES.sm,
     lineHeight: 18,
-    marginTop: 6,
+    marginTop: SPACING.xs + 2,
   },
 })
