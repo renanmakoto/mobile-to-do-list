@@ -1,60 +1,72 @@
+import React, { useEffect, useState } from 'react'
 import {
-  View,
+  Keyboard,
+  Platform,
+  Pressable,
+  StyleSheet,
   Text,
   TextInput,
-  StyleSheet,
   TouchableOpacity,
-  Keyboard,
-  Pressable,
-  Platform,
-} from "react-native"
-import React, { useEffect, useMemo, useState } from "react"
-import DateTimePicker from "@react-native-community/datetimepicker"
+  View,
+} from 'react-native'
+import DateTimePicker from '@react-native-community/datetimepicker'
+
+import { COLORS } from '../src/constants'
+import { BORDER_RADIUS, FONT_SIZES, SPACING } from './styles'
+
+const formatDateLabel = (date) => {
+  if (!date) return 'Pick a date'
+  return date.toLocaleDateString()
+}
+
+const formatTimeLabel = (date) => {
+  if (!date) return 'Pick a time'
+
+  let hours = date.getHours()
+  const minutes = String(date.getMinutes()).padStart(2, '0')
+  const suffix = hours >= 12 ? 'PM' : 'AM'
+
+  hours = hours % 12 || 12
+
+  return `${String(hours).padStart(2, '0')}:${minutes} ${suffix}`
+}
+
+const PickerButton = ({ label, value, onPress }) => (
+  <View style={styles.pickerRow}>
+    <Text style={styles.pickerLabel}>{label}</Text>
+    <Pressable style={styles.pickerSurface} onPress={onPress}>
+      <Text style={styles.pickerValue}>{value}</Text>
+    </Pressable>
+  </View>
+)
 
 export default function Input({ submitHandler, editingTask, cancelEdit }) {
-  const [value, setValue] = useState("")
+  const [value, setValue] = useState('')
   const [startDateTime, setStartDateTime] = useState(null)
   const [showTimePicker, setShowTimePicker] = useState(false)
   const [showDatePicker, setShowDatePicker] = useState(false)
+
   const isEditing = Boolean(editingTask)
-  const buttonLabel = isEditing ? "Update task" : "Save task"
+  const buttonLabel = isEditing ? 'Update task' : 'Save task'
+  const formTitle = isEditing ? 'Update task' : 'Add a task'
 
   useEffect(() => {
     if (editingTask) {
       setValue(editingTask.value)
-      if (editingTask.remindAt) {
-        const date = new Date(editingTask.remindAt)
-        setStartDateTime(date)
-      } else {
-        setStartDateTime(null)
-      }
+      setStartDateTime(editingTask.remindAt ? new Date(editingTask.remindAt) : null)
     } else {
-      setValue("")
+      setValue('')
       setStartDateTime(null)
     }
   }, [editingTask])
 
-  const formatDateLabel = (date) => {
-    if (!date) return "Pick a date"
-    return date.toLocaleDateString()
-  }
-
-  const formatTimeLabel = (date) => {
-    if (!date) return "Pick a time"
-    let hours = date.getHours()
-    const minutes = `${date.getMinutes()}`.padStart(2, "0")
-    const suffix = hours >= 12 ? "PM" : "AM"
-    hours = hours % 12 || 12
-    return `${`${hours}`.padStart(2, "0")}:${minutes} ${suffix}`
-  }
-
   const handleTimeChange = (_event, selectedDate) => {
-    if (Platform.OS !== "ios") {
+    if (Platform.OS !== 'ios') {
       setShowTimePicker(false)
     }
-    if (!selectedDate) {
-      return
-    }
+
+    if (!selectedDate) return
+
     const base = startDateTime || new Date()
     const updated = new Date(base)
     updated.setHours(selectedDate.getHours(), selectedDate.getMinutes(), 0, 0)
@@ -62,12 +74,12 @@ export default function Input({ submitHandler, editingTask, cancelEdit }) {
   }
 
   const handleDateChange = (_event, selectedDate) => {
-    if (Platform.OS !== "ios") {
+    if (Platform.OS !== 'ios') {
       setShowDatePicker(false)
     }
-    if (!selectedDate) {
-      return
-    }
+
+    if (!selectedDate) return
+
     const base = startDateTime || new Date()
     const updated = new Date(base)
     updated.setFullYear(
@@ -79,46 +91,42 @@ export default function Input({ submitHandler, editingTask, cancelEdit }) {
   }
 
   const handleSubmit = async () => {
-    if (!value.trim()) {
-      return
-    }
+    const trimmedValue = value.trim()
+    if (!trimmedValue) return
 
     try {
-      const remindAtOverride = startDateTime
-        ? startDateTime.getTime()
-        : null
-      await submitHandler(
-        value,
-        editingTask?.id || null,
-        remindAtOverride
-      )
+      const remindAtOverride = startDateTime?.getTime() ?? null
+      await submitHandler(value, editingTask?.id ?? null, remindAtOverride)
     } finally {
       Keyboard.dismiss()
+
       if (!editingTask) {
-        setValue("")
+        setValue('')
         setStartDateTime(null)
       }
     }
   }
 
+  const handleCancel = () => {
+    cancelEdit?.()
+  }
+
   return (
-    <View style={styles.card}>
-      <View style={styles.headingRow}>
-        <Text style={styles.cardTitle}>
-          {isEditing ? "Update task" : "Add a task"}
-        </Text>
+    <View style={styles.container}>
+      <View style={styles.headerRow}>
+        <Text style={styles.title}>{formTitle}</Text>
         {isEditing && (
-          <TouchableOpacity onPress={cancelEdit || (() => {})}>
+          <TouchableOpacity onPress={handleCancel}>
             <Text style={styles.cancelLink}>Cancel</Text>
           </TouchableOpacity>
         )}
       </View>
 
-      <View style={styles.inputRow}>
+      <View style={styles.inputWrapper}>
         <TextInput
           style={styles.input}
           placeholder="Describe what needs to happen..."
-          placeholderTextColor="#858585"
+          placeholderTextColor={COLORS.textSecondary}
           value={value}
           onChangeText={setValue}
           returnKeyType="done"
@@ -126,125 +134,118 @@ export default function Input({ submitHandler, editingTask, cancelEdit }) {
         />
       </View>
 
-      <View style={styles.timeRow}>
-        <Text style={styles.timeLabel}>Start date</Text>
-        <Pressable
-          style={styles.pickerSurface}
-          onPress={() => setShowDatePicker(true)}
-        >
-          <Text style={styles.timeValue}>{formatDateLabel(startDateTime)}</Text>
-        </Pressable>
-        {showDatePicker && (
-          <DateTimePicker
-            value={startDateTime || new Date()}
-            mode="date"
-            display={Platform.OS === "ios" ? "spinner" : "default"}
-            onChange={handleDateChange}
-            themeVariant="light"
-            textColor="#00ADA2"
-            accentColor="#00ADA2"
-          />
-        )}
-      </View>
+      <PickerButton
+        label="Start date"
+        value={formatDateLabel(startDateTime)}
+        onPress={() => setShowDatePicker(true)}
+      />
 
-      <View style={styles.timeRow}>
-        <Text style={styles.timeLabel}>Start time</Text>
-        <Pressable
-          style={styles.pickerSurface}
-          onPress={() => setShowTimePicker(true)}
-        >
-          <Text style={styles.timeValue}>{formatTimeLabel(startDateTime)}</Text>
-        </Pressable>
-        {showTimePicker && (
-          <DateTimePicker
-            value={startDateTime || new Date()}
-            mode="time"
-            is24Hour={false}
-            display={Platform.OS === "ios" ? "spinner" : "default"}
-            onChange={handleTimeChange}
-            themeVariant="light"
-            textColor="#00ADA2"
-            accentColor="#00ADA2"
-          />
-        )}
-      </View>
+      {showDatePicker && (
+        <DateTimePicker
+          value={startDateTime || new Date()}
+          mode="date"
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={handleDateChange}
+          themeVariant="light"
+          textColor={COLORS.primary}
+          accentColor={COLORS.primary}
+        />
+      )}
 
-      <TouchableOpacity onPress={handleSubmit} style={styles.addButton}>
-        <Text style={styles.addButtonText}>{buttonLabel}</Text>
+      <PickerButton
+        label="Start time"
+        value={formatTimeLabel(startDateTime)}
+        onPress={() => setShowTimePicker(true)}
+      />
+
+      {showTimePicker && (
+        <DateTimePicker
+          value={startDateTime || new Date()}
+          mode="time"
+          is24Hour={false}
+          display={Platform.OS === 'ios' ? 'spinner' : 'default'}
+          onChange={handleTimeChange}
+          themeVariant="light"
+          textColor={COLORS.primary}
+          accentColor={COLORS.primary}
+        />
+      )}
+
+      <TouchableOpacity onPress={handleSubmit} style={styles.submitButton}>
+        <Text style={styles.submitButtonText}>{buttonLabel}</Text>
       </TouchableOpacity>
-
     </View>
   )
 }
 
 const styles = StyleSheet.create({
-  card: {
-    paddingVertical: 16,
-    marginBottom: 32,
+  container: {
+    paddingVertical: SPACING.lg,
+    marginBottom: SPACING.xxl,
   },
-  cardTitle: {
-    color: "#858585",
-    fontSize: 16,
-    fontWeight: "600",
-    marginBottom: 16,
+  headerRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: SPACING.xs,
   },
-  headingRow: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    alignItems: "center",
-    marginBottom: 4,
+  title: {
+    color: COLORS.textSecondary,
+    fontSize: FONT_SIZES.xl,
+    fontWeight: '600',
+    marginBottom: SPACING.lg,
   },
   cancelLink: {
-    color: "#00ADA2",
-    fontSize: 14,
-    fontWeight: "500",
+    color: COLORS.primary,
+    fontSize: FONT_SIZES.md,
+    fontWeight: '500',
   },
-  inputRow: {
-    flexDirection: "column",
+  inputWrapper: {
+    flexDirection: 'column',
     borderWidth: 1,
-    borderColor: "#00ADA2",
-    borderRadius: 10,
-    padding: 12,
+    borderColor: COLORS.primary,
+    borderRadius: BORDER_RADIUS.md,
+    padding: SPACING.md,
   },
   input: {
     flex: 1,
-    color: "#00ADA2",
-    fontSize: 16,
+    color: COLORS.primary,
+    fontSize: FONT_SIZES.xl,
     paddingVertical: 10,
   },
-  timeRow: {
-    marginTop: 16,
+  pickerRow: {
+    marginTop: SPACING.lg,
   },
-  timeLabel: {
-    color: "#858585",
-    fontSize: 13,
-    marginBottom: 8,
+  pickerLabel: {
+    color: COLORS.textSecondary,
+    fontSize: FONT_SIZES.sm,
+    marginBottom: SPACING.sm,
   },
   pickerSurface: {
     borderWidth: 1,
-    borderColor: "#00ADA2",
-    borderRadius: 10,
+    borderColor: COLORS.primary,
+    borderRadius: BORDER_RADIUS.md,
     paddingVertical: 10,
-    paddingHorizontal: 12,
-    backgroundColor: "#EFF9F8",
+    paddingHorizontal: SPACING.md,
+    backgroundColor: COLORS.background,
   },
-  timeValue: {
-    color: "#00ADA2",
-    fontSize: 15,
+  pickerValue: {
+    color: COLORS.primary,
+    fontSize: FONT_SIZES.lg,
   },
-  addButton: {
-    alignSelf: "center",
+  submitButton: {
+    alignSelf: 'center',
     paddingVertical: 10,
-    marginTop: 12,
+    marginTop: SPACING.md,
     borderWidth: 1,
-    borderColor: "#00ADA2",
-    borderRadius: 10,
-    paddingHorizontal: 24,
+    borderColor: COLORS.primary,
+    borderRadius: BORDER_RADIUS.md,
+    paddingHorizontal: SPACING.xl,
   },
-  addButtonText: {
-    fontWeight: "600",
-    color: "#00ADA2",
-    fontSize: 15,
+  submitButtonText: {
+    fontWeight: '600',
+    color: COLORS.primary,
+    fontSize: FONT_SIZES.lg,
     letterSpacing: 0.4,
   },
 })
