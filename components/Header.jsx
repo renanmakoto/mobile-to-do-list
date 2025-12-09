@@ -1,90 +1,73 @@
-import { View, Text, StyleSheet } from "react-native"
-import React from "react"
+import React from 'react'
+import { StyleSheet, Text, View } from 'react-native'
 
-const formatToday = () => {
-  const now = new Date()
-  return now.toLocaleDateString(undefined, {
-    weekday: "long",
-    month: "short",
-    day: "numeric",
-  })
-}
+import { COLORS } from '../src/constants'
+import { formatDate } from '../src/utils'
+import { FONT_SIZES, SPACING } from './styles'
+
+const MetricCard = ({ value, label }) => (
+  <View style={styles.metricCard}>
+    <Text style={styles.metricValue}>{value}</Text>
+    <Text style={styles.metricLabel}>{label}</Text>
+  </View>
+)
 
 export default function Header({ totalTasks = 0, remindersCount = 0 }) {
+  const todayFormatted = formatDate(new Date())
+
   return (
     <View style={styles.container}>
-      <Text style={styles.kicker}></Text>
       <Text style={styles.title}>toDot</Text>
-      <Text style={styles.subtitle}></Text>
 
-      <View style={styles.metaRow}>
-        <View style={styles.metaCard}>
-          <Text style={styles.metaValue}>{totalTasks}</Text>
-          <Text style={styles.metaLabel}>Tasks</Text>
-        </View>
-        <View style={styles.metaCard}>
-          <Text style={styles.metaValue}>{remindersCount}</Text>
-          <Text style={styles.metaLabel}>Reminders</Text>
-        </View>
+      <View style={styles.metricsRow}>
+        <MetricCard value={totalTasks} label="Tasks" />
+        <MetricCard value={remindersCount} label="Reminders" />
       </View>
 
-      <Text style={styles.date}>{formatToday()}</Text>
+      <Text style={styles.date}>{todayFormatted}</Text>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 4,
-    marginBottom: 24,
-  },
-  kicker: {
-    color: "#858585",
-    textTransform: "uppercase",
-    fontSize: 12,
-    letterSpacing: 2,
-    marginBottom: 6,
+    paddingHorizontal: SPACING.xs,
+    marginBottom: SPACING.xl,
   },
   title: {
-    fontSize: 34,
-    color: "#00ADA2",
-    fontWeight: "700",
-    textAlign: "center",
+    fontSize: FONT_SIZES.header,
+    color: COLORS.primary,
+    fontWeight: '700',
+    textAlign: 'center',
   },
-  subtitle: {
-    color: "#858585",
-    marginTop: 6,
-    fontSize: 15,
-    lineHeight: 21,
-  },
-  metaRow: {
-    flexDirection: "row",
+  metricsRow: {
+    flexDirection: 'row',
     marginTop: 28,
-    justifyContent: "space-between",
+    justifyContent: 'space-between',
   },
-  metaCard: {
+  metricCard: {
     flex: 1,
-    paddingVertical: 4,
+    paddingVertical: SPACING.xs,
   },
-  metaValue: {
-    color: "#00ADA2",
-    fontSize: 22,
-    fontWeight: "700",
-    textAlign: "center",
+  metricValue: {
+    color: COLORS.primary,
+    fontSize: FONT_SIZES.title,
+    fontWeight: '700',
+    textAlign: 'center',
   },
-  metaLabel: {
-    color: "#858585",
-    fontSize: 12,
+  metricLabel: {
+    color: COLORS.textSecondary,
+    fontSize: FONT_SIZES.xs,
     letterSpacing: 1,
-    textAlign: "center",
-    marginTop: 4,
-    textTransform: "uppercase",
+    textAlign: 'center',
+    marginTop: SPACING.xs,
+    textTransform: 'uppercase',
   },
   date: {
     marginTop: 28,
-    color: "#858585",
-    fontSize: 13,
+    color: COLORS.textSecondary,
+    fontSize: FONT_SIZES.sm,
     letterSpacing: 0.6,
-    textAlign: "center",
+    textAlign: 'center',
   },
 })
