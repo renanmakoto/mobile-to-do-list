@@ -1,34 +1,71 @@
-import { View, Text, TouchableOpacity, StyleSheet } from "react-native"
-import React, { useMemo } from "react"
-import { Ionicons } from "@expo/vector-icons"
+import React, { useMemo } from 'react'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { Ionicons } from '@expo/vector-icons'
 
-const formatReminder = (timestamp, repeat) => {
-  if (!timestamp) {
-    return null
-  }
+import { COLORS, REPEAT_TYPES } from '../src/constants'
+import { formatTime } from '../src/utils'
+import { BORDER_RADIUS, FONT_SIZES, SPACING } from './styles'
+
+const formatReminderLabel = (timestamp, repeat) => {
+  if (!timestamp) return null
 
   const date = new Date(timestamp)
-  const timePart = date.toLocaleTimeString(undefined, {
-    hour: "numeric",
-    minute: "2-digit",
-  })
+  const timePart = formatTime(date)
 
-  if (repeat === "daily") {
+  if (repeat === REPEAT_TYPES.DAILY) {
     return `Daily at ${timePart}`
   }
 
-  if (repeat === "weekly") {
-    const weekday = date.toLocaleDateString(undefined, { weekday: "short" })
+  if (repeat === REPEAT_TYPES.WEEKLY) {
+    const weekday = date.toLocaleDateString(undefined, { weekday: 'short' })
     return `${weekday} • ${timePart}`
   }
 
   const datePart = date.toLocaleDateString(undefined, {
-    month: "short",
-    day: "numeric",
+    month: 'short',
+    day: 'numeric',
   })
 
   return `${datePart} • ${timePart}`
 }
+
+const Checkbox = ({ checked, onToggle }) => (
+  <TouchableOpacity onPress={onToggle} style={styles.checkboxWrapper}>
+    <View style={[styles.checkbox, checked && styles.checkboxChecked]}>
+      {checked && <Ionicons name="checkmark" size={16} color={COLORS.background} />}
+    </View>
+  </TouchableOpacity>
+)
+
+const IconButton = ({ icon, color, onPress, disabled, style }) => (
+  <TouchableOpacity
+    onPress={onPress}
+    disabled={disabled}
+    style={[styles.iconButton, disabled && styles.iconButtonDisabled, style]}
+  >
+    <Ionicons name={icon} size={18} color={color} />
+  </TouchableOpacity>
+)
+
+const ReminderBadge = ({ label, isOverdue, isCompleted }) => (
+  <View style={styles.reminderRow}>
+    <Ionicons
+      name="time-outline"
+      size={14}
+      color={isOverdue ? COLORS.primary : COLORS.textSecondary}
+    />
+    <Text
+      style={[
+        styles.reminderText,
+        isOverdue && styles.reminderTextOverdue,
+        isCompleted && styles.reminderTextCompleted,
+      ]}
+    >
+      {label}
+      {isOverdue && ' • overdue'}
+    </Text>
+  </View>
+)
 
 export default function Task({
   item,
@@ -40,90 +77,70 @@ export default function Task({
   disableMoveUp,
   disableMoveDown,
 }) {
-  const completed = item.completed
-  const now = Date.now()
-  const isOverdue =
-    !completed && item.remindAt && item.remindAt < now && !item.repeat
+  const { id, value, completed, remindAt, repeat } = item
+
+  const isOverdue = useMemo(() => {
+    if (completed || !remindAt || repeat) return false
+    return remindAt < Date.now()
+  }, [completed, remindAt, repeat])
+
   const reminderLabel = useMemo(
-    () => formatReminder(item.remindAt, item.repeat),
-    [item.remindAt, item.repeat]
+    () => formatReminderLabel(remindAt, repeat),
+    [remindAt, repeat]
   )
 
+  const handleToggle = () => toggleComplete?.(id, !completed)
+  const handleEdit = () => onEdit?.(id)
+  const handleDelete = () => deleteItem(id)
+  const handleMoveUp = () => onMoveUp?.(id)
+  const handleMoveDown = () => onMoveDown?.(id)
+
   return (
-    <View style={[styles.card, completed && styles.cardChecked]}>
-      <TouchableOpacity
-        onPress={() => toggleComplete?.(item.id, !completed)}
-        style={styles.checkboxWrapper}
-      >
-        <View style={[styles.checkbox, completed && styles.checkboxOn]}>
-          {completed && (
-            <Ionicons name="checkmark" size={16} color="#EFF9F8" />
-          )}
-        </View>
-      </TouchableOpacity>
+    <View style={[styles.card, completed && styles.cardCompleted]}>
+      <Checkbox checked={completed} onToggle={handleToggle} />
 
       <View style={styles.content}>
-        <Text style={[styles.title, completed && styles.titleChecked]}>
-          {item.value}
+        <Text style={[styles.title, completed && styles.titleCompleted]}>
+          {value}
         </Text>
+
         {reminderLabel && (
-          <View style={styles.metaRow}>
-            <Ionicons
-              name="time-outline"
-              size={14}
-              color={isOverdue ? "#00ADA2" : "#858585"}
-            />
-            <Text
-              style={[
-                styles.metaText,
-                isOverdue && styles.metaTextOverdue,
-                completed && styles.metaTextCompleted,
-              ]}
-            >
-              {reminderLabel}
-              {isOverdue && " • overdue"}
-            </Text>
-          </View>
+          <ReminderBadge
+            label={reminderLabel}
+            isOverdue={isOverdue}
+            isCompleted={completed}
+          />
         )}
       </View>
 
       <View style={styles.actionsColumn}>
         <View style={styles.primaryActions}>
-          <TouchableOpacity
-            onPress={() => onEdit?.(item.id)}
-            style={styles.iconButton}
-          >
-            <Ionicons name="create-outline" size={18} color="#00ADA2" />
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => deleteItem(item.id)}
-            style={styles.iconButton}
-          >
-            <Ionicons name="trash-outline" size={18} color="#858585" />
-          </TouchableOpacity>
+          <IconButton
+            icon="create-outline"
+            color={COLORS.primary}
+            onPress={handleEdit}
+          />
+          <IconButton
+            icon="trash-outline"
+            color={COLORS.textSecondary}
+            onPress={handleDelete}
+          />
         </View>
-        <View style={styles.reorderColumn}>
-          <TouchableOpacity
+
+        <View style={styles.reorderActions}>
+          <IconButton
+            icon="chevron-up-outline"
+            color={COLORS.textSecondary}
+            onPress={handleMoveUp}
             disabled={disableMoveUp}
-            onPress={() => onMoveUp?.(item.id)}
-            style={[
-              styles.iconButton,
-              disableMoveUp && styles.iconButtonDisabled,
-            ]}
-          >
-            <Ionicons name="chevron-up-outline" size={16} color="#858585" />
-          </TouchableOpacity>
-          <TouchableOpacity
+          />
+          <IconButton
+            icon="chevron-down-outline"
+            color={COLORS.textSecondary}
+            onPress={handleMoveDown}
             disabled={disableMoveDown}
-            onPress={() => onMoveDown?.(item.id)}
-            style={[
-              styles.iconButton,
-              styles.iconButtonBottom,
-              disableMoveDown && styles.iconButtonDisabled,
-            ]}
-          >
-            <Ionicons name="chevron-down-outline" size={16} color="#858585" />
-          </TouchableOpacity>
+            style={styles.moveDownButton}
+          />
         </View>
       </View>
     </View>
@@ -132,83 +149,83 @@ export default function Task({
 
 const styles = StyleSheet.create({
   card: {
-    flexDirection: "row",
-    alignItems: "center",
-    paddingVertical: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: SPACING.lg,
     borderBottomWidth: 1,
-    borderBottomColor: "#858585",
+    borderBottomColor: COLORS.textSecondary,
   },
-  cardChecked: {
+  cardCompleted: {
     opacity: 0.5,
   },
   checkboxWrapper: {
-    padding: 4,
-    marginRight: 12,
+    padding: SPACING.xs,
+    marginRight: SPACING.md,
   },
   checkbox: {
     height: 24,
     width: 24,
-    borderRadius: 6,
+    borderRadius: BORDER_RADIUS.sm,
     borderWidth: 2,
-    borderColor: "#858585",
-    alignItems: "center",
-    justifyContent: "center",
+    borderColor: COLORS.textSecondary,
+    alignItems: 'center',
+    justifyContent: 'center',
   },
-  checkboxOn: {
-    borderColor: "#00ADA2",
-    backgroundColor: "#00ADA2",
+  checkboxChecked: {
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.primary,
   },
   content: {
     flex: 1,
-    marginRight: 12,
+    marginRight: SPACING.md,
   },
   title: {
-    color: "#00ADA2",
-    fontSize: 16,
-    fontWeight: "600",
+    color: COLORS.primary,
+    fontSize: FONT_SIZES.xl,
+    fontWeight: '600',
   },
-  titleChecked: {
-    textDecorationLine: "line-through",
-    color: "#858585",
+  titleCompleted: {
+    textDecorationLine: 'line-through',
+    color: COLORS.textSecondary,
   },
-  metaRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginTop: 8,
+  reminderRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginTop: SPACING.sm,
   },
-  metaText: {
-    color: "#858585",
-    fontSize: 13,
+  reminderText: {
+    color: COLORS.textSecondary,
+    fontSize: FONT_SIZES.sm,
     letterSpacing: 0.3,
-    marginLeft: 6,
+    marginLeft: SPACING.xs + 2,
   },
-  metaTextOverdue: {
-    color: "#00ADA2",
+  reminderTextOverdue: {
+    color: COLORS.primary,
   },
-  metaTextCompleted: {
-    color: "#858585",
+  reminderTextCompleted: {
+    color: COLORS.textSecondary,
     opacity: 0.7,
   },
   actionsColumn: {
-    marginLeft: 12,
-    alignItems: "center",
+    marginLeft: SPACING.md,
+    alignItems: 'center',
   },
   primaryActions: {
-    flexDirection: "row",
-    marginBottom: 6,
+    flexDirection: 'row',
+    marginBottom: SPACING.xs + 2,
+  },
+  reorderActions: {
+    flexDirection: 'column',
+    alignItems: 'center',
   },
   iconButton: {
-    padding: 6,
-    marginLeft: 4,
-  },
-  iconButtonBottom: {
-    marginTop: -8,
+    padding: SPACING.xs + 2,
+    marginLeft: SPACING.xs,
   },
   iconButtonDisabled: {
     opacity: 0.3,
   },
-  reorderColumn: {
-    flexDirection: "column",
-    alignItems: "center",
+  moveDownButton: {
+    marginTop: -8,
   },
 })
