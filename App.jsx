@@ -1,19 +1,33 @@
-import { StatusBar } from "expo-status-bar"
-import React from "react"
+import React from 'react'
 import {
-  StyleSheet,
-  FlatList,
-  View,
-  Text,
-  SafeAreaView,
   ActivityIndicator,
-} from "react-native"
-import AssistantPanel from "./components/AssistantPanel"
-import Empty from "./components/Empty"
-import Header from "./components/Header"
-import Input from "./components/Input"
-import Task from "./components/Task"
-import { useTaskManager } from "./src/hooks/useTaskManager"
+  FlatList,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  View,
+} from 'react-native'
+import { StatusBar } from 'expo-status-bar'
+
+import AssistantPanel from './components/AssistantPanel'
+import Empty from './components/Empty'
+import Header from './components/Header'
+import Input from './components/Input'
+import Task from './components/Task'
+import { COLORS } from './src/constants'
+import { useTaskManager } from './src/hooks/useTaskManager'
+import { FONT_SIZES, SPACING } from './components/styles'
+
+const CURRENT_YEAR = new Date().getFullYear()
+
+const LoadingState = () => (
+  <View style={styles.loader}>
+    <ActivityIndicator size="small" color={COLORS.primary} />
+  </View>
+)
+
+const TaskListHeader = ({ hasTasks }) =>
+  hasTasks ? <Text style={styles.sectionTitle}>Your tasks</Text> : null
 
 export default function App() {
   const {
@@ -31,58 +45,60 @@ export default function App() {
     cancelEditing,
   } = useTaskManager()
 
+  const renderListHeader = () => (
+    <View style={styles.listHeader}>
+      <Header totalTasks={tasks.length} remindersCount={reminderCount} />
+
+      <AssistantPanel
+        greeting={assistantInsights.greeting}
+        summary={assistantInsights.summary}
+        suggestions={assistantInsights.suggestions}
+      />
+
+      <Input
+        submitHandler={submitHandler}
+        editingTask={editingTask}
+        cancelEdit={cancelEditing}
+      />
+
+      <TaskListHeader hasTasks={tasks.length > 0} />
+    </View>
+  )
+
+  const renderTask = ({ item, index }) => (
+    <Task
+      item={item}
+      deleteItem={handleDeleteTask}
+      toggleComplete={handleToggleComplete}
+      onEdit={startEditing}
+      onMoveUp={handleMoveUp}
+      onMoveDown={handleMoveDown}
+      disableMoveUp={index === 0}
+      disableMoveDown={index === tasks.length - 1}
+    />
+  )
+
+  const renderEmptyState = () =>
+    loadingTasks ? <LoadingState /> : <Empty />
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar style="dark" />
+
       <FlatList
         data={tasks}
         keyExtractor={(item) => item.id}
-        renderItem={({ item, index }) => (
-          <Task
-            item={item}
-            deleteItem={handleDeleteTask}
-            toggleComplete={handleToggleComplete}
-            onEdit={startEditing}
-            onMoveUp={handleMoveUp}
-            onMoveDown={handleMoveDown}
-            disableMoveUp={index === 0}
-            disableMoveDown={index === tasks.length - 1}
-          />
-        )}
+        renderItem={renderTask}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={[
           styles.listContent,
           tasks.length === 0 && styles.listContentEmpty,
         ]}
-        ListHeaderComponent={
-          <View style={styles.listHeader}>
-            <Header totalTasks={tasks.length} remindersCount={reminderCount} />
-            <AssistantPanel
-              greeting={assistantInsights.greeting}
-              summary={assistantInsights.summary}
-              suggestions={assistantInsights.suggestions}
-            />
-            <Input
-              submitHandler={submitHandler}
-              editingTask={editingTask}
-              cancelEdit={cancelEditing}
-            />
-            {tasks.length > 0 && (
-              <Text style={styles.sectionTitle}>Your tasks</Text>
-            )}
-          </View>
-        }
-        ListEmptyComponent={
-          loadingTasks ? (
-            <View style={styles.loader}>
-              <ActivityIndicator size="small" color="#00ADA2" />
-            </View>
-          ) : (
-            <Empty />
-          )
-        }
+        ListHeaderComponent={renderListHeader}
+        ListEmptyComponent={renderEmptyState}
       />
-      <Text style={styles.footer}>2025 • dotExtension</Text>
+
+      <Text style={styles.footer}>{CURRENT_YEAR} • dotExtension</Text>
     </SafeAreaView>
   )
 }
@@ -90,37 +106,37 @@ export default function App() {
 const styles = StyleSheet.create({
   safeArea: {
     flex: 1,
-    backgroundColor: "#EFF9F8",
+    backgroundColor: COLORS.background,
   },
   listContent: {
-    paddingHorizontal: 24,
+    paddingHorizontal: SPACING.xl,
     paddingBottom: 120,
   },
   listContentEmpty: {
     flexGrow: 1,
-    justifyContent: "center",
+    justifyContent: 'center',
   },
   listHeader: {
-    paddingTop: 24,
-    paddingBottom: 8,
+    paddingTop: SPACING.xl,
+    paddingBottom: SPACING.sm,
   },
   sectionTitle: {
-    color: "#858585",
-    fontSize: 13,
-    fontWeight: "600",
-    textTransform: "uppercase",
+    color: COLORS.textSecondary,
+    fontSize: FONT_SIZES.sm,
+    fontWeight: '600',
+    textTransform: 'uppercase',
     letterSpacing: 1,
-    marginBottom: 18,
+    marginBottom: SPACING.lg + 2,
   },
   loader: {
     paddingTop: 80,
-    alignItems: "center",
+    alignItems: 'center',
   },
   footer: {
-    color: "#858585",
-    textAlign: "center",
-    paddingVertical: 18,
-    fontSize: 12,
+    color: COLORS.textSecondary,
+    textAlign: 'center',
+    paddingVertical: SPACING.lg + 2,
+    fontSize: FONT_SIZES.xs,
     letterSpacing: 1,
   },
 })
