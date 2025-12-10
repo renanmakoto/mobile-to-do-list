@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import * as Notifications from "expo-notifications"
-import { ensureNotificationsReady } from "../notifications/setup"
-import {
-  normalizeRemindAt,
-  parseReminderTokens,
-} from "../notifications/parseReminder"
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import * as Notifications from 'expo-notifications'
+
+import { TIME, NOTIFICATIONS as NOTIFICATION_CONFIG, REPEAT_TYPES } from '../constants'
+import { generateId, getGreeting, pluralize } from '../utils'
+import { ensureNotificationsReady } from '../notifications/setup'
+import { normalizeRemindAt, parseReminderTokens } from '../notifications/parseReminder'
 import {
   deleteTask as deleteTaskRecord,
   ensureStorageReady,
@@ -12,13 +12,7 @@ import {
   insertTask,
   persistPositions,
   updateTask as updateTaskRecord,
-} from "../storage/tasks"
-
-const FIFTEEN_MINUTES_MS = 15 * 60 * 1000
-const UPCOMING_WINDOW_MS = 2 * 60 * 60 * 1000
-
-const generateTaskId = () =>
-  `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
+} from '../storage/tasks'
 
 const reindexTasks = (tasks = []) =>
   tasks.map((task, index) => ({
@@ -27,127 +21,117 @@ const reindexTasks = (tasks = []) =>
     key: task.id || task.key,
   }))
 
-const pluralize = (value, singular, plural) =>
-  `${value} ${value === 1 ? singular : plural ?? `${singular}s`}`
-
-const getGreeting = () => {
-  const hour = new Date().getHours()
-  if (hour < 12) return "Good morning"
-  if (hour < 18) return "Good afternoon"
-  return "Good evening"
-}
-
 const buildAssistantInsights = (tasks = []) => {
   const greeting = getGreeting()
+
   if (tasks.length === 0) {
-    return {
-      greeting,
-      summary: "",
-      suggestions: [],
-    }
+    return { greeting, summary: '', suggestions: [] }
   }
 
   const now = Date.now()
-  const active = tasks.filter((task) => !task.completed)
-  const overdue = active.filter(
+  const activeTasks = tasks.filter((task) => !task.completed)
+
+  const overdueTasks = activeTasks.filter(
     (task) => task.remindAt && !task.repeat && task.remindAt < now
   )
-  const dueSoon = active.filter(
+
+  const upcomingTasks = activeTasks.filter(
     (task) =>
       task.remindAt &&
       task.remindAt >= now &&
-      task.remindAt <= now + UPCOMING_WINDOW_MS
+      task.remindAt <= now + TIME.UPCOMING_WINDOW
   )
-  const missingReminders = active.filter((task) => !task.remindAt)
+
+  const tasksWithoutReminders = activeTasks.filter((task) => !task.remindAt)
 
   const summaryParts = []
-  if (overdue.length) {
-    summaryParts.push(`${pluralize(overdue.length, "task")} overdue`)
+
+  if (overdueTasks.length) {
+    summaryParts.push(`${pluralize(overdueTasks.length, 'task')} overdue`)
   }
-  if (dueSoon.length) {
-    summaryParts.push(`${pluralize(dueSoon.length, "task")} due soon`)
+
+  if (upcomingTasks.length) {
+    summaryParts.push(`${pluralize(upcomingTasks.length, 'task')} due soon`)
   }
+
   if (!summaryParts.length) {
     summaryParts.push(
-      active.length
-        ? "All active tasks are on schedule."
-        : "Everything is complete. Nice work."
+      activeTasks.length
+        ? 'All active tasks are on schedule.'
+        : 'Everything is complete. Nice work.'
     )
   }
 
   const suggestions = []
-  if (overdue.length) {
+
+  if (overdueTasks.length) {
     suggestions.push({
-      id: "overdue",
-      label: `Follow up on "${overdue[0].value}" or snooze it for later.`,
+      id: 'overdue',
+      label: `Follow up on "${overdueTasks[0].value}" or snooze it for later.`,
     })
   }
-  if (missingReminders.length) {
+
+  if (tasksWithoutReminders.length) {
     suggestions.push({
-      id: "reminders",
-      label: `Add reminders to ${pluralize(
-        missingReminders.length,
-        "task"
-      )} so nothing slips.`,
+      id: 'reminders',
+      label: `Add reminders to ${pluralize(tasksWithoutReminders.length, 'task')} so nothing slips.`,
     })
   }
-  if (!suggestions.length && dueSoon.length) {
+
+  if (!suggestions.length && upcomingTasks.length) {
     suggestions.push({
-      id: "dueSoon",
-      label: `"${dueSoon[0].value}" is coming up soon—get ready.`,
+      id: 'dueSoon',
+      label: `"${upcomingTasks[0].value}" is coming up soon—get ready.`,
     })
   }
 
   return {
     greeting,
-    summary: summaryParts.join(" • "),
+    summary: summaryParts.join(' • '),
     suggestions,
   }
 }
 
-const buildTrigger = (timestamp, repeat) => {
-  if (!timestamp) {
-    return null
-  }
+const buildNotificationTrigger = (timestamp, repeat) => {
+  if (!timestamp) return null
 
-  if (repeat === "daily") {
-    const date = new Date(timestamp)
+  const date = new Date(timestamp)
+  const channelId = NOTIFICATION_CONFIG.CHANNEL_ID
+
+  if (repeat === REPEAT_TYPES.DAILY) {
     return {
       hour: date.getHours(),
       minute: date.getMinutes(),
       repeats: true,
-      channelId: "reminders",
+      channelId,
     }
   }
 
-  if (repeat === "weekly") {
-    const date = new Date(timestamp)
+  if (repeat === REPEAT_TYPES.WEEKLY) {
     const weekday = date.getDay() === 0 ? 7 : date.getDay()
     return {
       weekday,
       hour: date.getHours(),
       minute: date.getMinutes(),
       repeats: true,
-      channelId: "reminders",
+      channelId,
     }
   }
 
-  return {
-    date: timestamp,
-    channelId: "reminders",
-  }
+  return { date: timestamp, channelId }
 }
 
 export const useTaskManager = () => {
   const [tasks, setTasksInternal] = useState([])
-  const tasksRef = useRef([])
   const [loadingTasks, setLoadingTasks] = useState(true)
   const [editingTaskId, setEditingTaskId] = useState(null)
+
+  const tasksRef = useRef([])
   const notificationsGrantedRef = useRef(false)
 
   const setTasks = useCallback((updater) => {
     setTasksInternal((prev) => {
-      const next = typeof updater === "function" ? updater(prev) : updater
+      const next = typeof updater === 'function' ? updater(prev) : updater
       tasksRef.current = next
       return next
     })
@@ -157,83 +141,78 @@ export const useTaskManager = () => {
     () => tasks.filter((task) => task.remindAt && !task.completed).length,
     [tasks]
   )
+
   const editingTask = useMemo(
     () => tasks.find((task) => task.id === editingTaskId) || null,
     [editingTaskId, tasks]
   )
+
   const assistantInsights = useMemo(
     () => buildAssistantInsights(tasks),
     [tasks]
   )
 
-  const cancelNotificationIfNeeded = useCallback(async (notificationId) => {
-    if (!notificationId) {
-      return
-    }
+  const cancelNotification = useCallback(async (notificationId) => {
+    if (!notificationId) return
+
     try {
       await Notifications.cancelScheduledNotificationAsync(notificationId)
-      console.log(`Cancelled reminder ${notificationId}`)
+      console.log(`Cancelled reminder: ${notificationId}`)
     } catch (error) {
-      console.warn("Failed to cancel scheduled notification", error)
+      console.warn('Failed to cancel notification:', error)
     }
   }, [])
 
-  const scheduleNotificationForTask = useCallback(
+  const scheduleNotification = useCallback(
     async ({ taskId, body, remindAt, repeat }) => {
-      if (!remindAt) {
+      if (!remindAt || !notificationsGrantedRef.current) {
+        if (!notificationsGrantedRef.current) {
+          console.warn('Skipping notification: permission not granted')
+        }
         return null
       }
-      if (!notificationsGrantedRef.current) {
-        console.warn(
-          "Skipping schedule because notification permission is missing"
-        )
-        return null
-      }
-      const trigger = buildTrigger(remindAt, repeat)
-      if (!trigger) {
-        return null
-      }
+
+      const trigger = buildNotificationTrigger(remindAt, repeat)
+      if (!trigger) return null
+
       try {
         const notificationId = await Notifications.scheduleNotificationAsync({
           content: {
-            title: "Reminder",
+            title: 'Reminder',
             body,
             data: { key: taskId },
-            categoryIdentifier: "task-reminder-actions",
+            categoryIdentifier: NOTIFICATION_CONFIG.CATEGORY_ID,
           },
           trigger,
         })
+
         console.log(`Scheduled reminder ${notificationId} for task ${taskId}`)
         return notificationId
       } catch (error) {
-        console.warn("Failed to schedule notification", error)
+        console.warn('Failed to schedule notification:', error)
         return null
       }
     },
     []
   )
 
-  const persistPositionsSafe = useCallback(async (nextTasks) => {
+  const savePositions = useCallback(async (taskList) => {
     try {
-      await persistPositions(nextTasks)
+      await persistPositions(taskList)
     } catch (error) {
-      console.warn("Failed to persist task order", error)
+      console.warn('Failed to persist task order:', error)
     }
   }, [])
 
-  const handleCreateTask = useCallback(
+  const createTask = useCallback(
     async ({ value, remindAt, repeat }) => {
-      const id = generateTaskId()
-      let notificationId = null
-      if (remindAt) {
-        notificationId = await scheduleNotificationForTask({
-          taskId: id,
-          body: value,
-          remindAt,
-          repeat,
-        })
-      }
+      const id = generateId()
       const timestamp = Date.now()
+
+      const notificationId = remindAt
+        ? await scheduleNotification({ taskId: id, body: value, remindAt, repeat })
+        : null
+
       const newTask = {
         id,
         key: id,
@@ -247,53 +226,43 @@ export const useTaskManager = () => {
         createdAt: timestamp,
         updatedAt: timestamp,
       }
+
       try {
         await insertTask(newTask)
       } catch (error) {
-        console.warn("Failed to persist new task", error)
+        console.warn('Failed to persist new task:', error)
       }
+
       const updatedTasks = reindexTasks([newTask, ...tasksRef.current])
       setTasks(updatedTasks)
-      await persistPositionsSafe(updatedTasks)
+      await savePositions(updatedTasks)
     },
-    [persistPositionsSafe, scheduleNotificationForTask, setTasks]
+    [savePositions, scheduleNotification, setTasks]
   )
 
-  const handleUpdateTask = useCallback(
-    async ({
-      taskId,
-      nextValue,
-      nextRemindAtRaw,
-      nextRepeatRaw,
-      instructionMatched,
-    }) => {
+  const updateTask = useCallback(
+    async ({ taskId, nextValue, nextRemindAtRaw, nextRepeatRaw, instructionMatched }) => {
       const existing = tasksRef.current.find((task) => task.id === taskId)
-      if (!existing) {
-        return
-      }
+      if (!existing) return
 
       let nextRemindAt = existing.remindAt
       let nextRepeat = existing.repeat
       let nextNotificationId = existing.notificationId
 
       if (instructionMatched) {
-        await cancelNotificationIfNeeded(existing.notificationId)
+        await cancelNotification(existing.notificationId)
         nextRemindAt = nextRemindAtRaw
         nextRepeat = nextRepeatRaw ?? null
         nextNotificationId = null
-      } else if (
-        existing.notificationId &&
-        nextRemindAt &&
-        nextValue !== existing.value
-      ) {
-        await cancelNotificationIfNeeded(existing.notificationId)
+      } else if (existing.notificationId && nextRemindAt && nextValue !== existing.value) {
+        await cancelNotification(existing.notificationId)
         nextNotificationId = null
       }
 
       if (!nextRemindAt) {
         nextNotificationId = null
       } else if (!nextNotificationId) {
-        nextNotificationId = await scheduleNotificationForTask({
+        nextNotificationId = await scheduleNotification({
           taskId,
           body: nextValue,
           remindAt: nextRemindAt,
@@ -307,60 +276,57 @@ export const useTaskManager = () => {
         repeat: nextRepeat ?? null,
         notificationId: nextNotificationId,
       }
+
       const updatedAt = await updateTaskRecord(taskId, patch)
+
       setTasks((prev) =>
         prev.map((task) =>
           task.id === taskId
-            ? {
-                ...task,
-                ...patch,
-                updatedAt: updatedAt ?? task.updatedAt,
-              }
+            ? { ...task, ...patch, updatedAt: updatedAt ?? task.updatedAt }
             : task
         )
       )
+
       setEditingTaskId(null)
     },
-    [cancelNotificationIfNeeded, scheduleNotificationForTask, setTasks]
+    [cancelNotification, scheduleNotification, setTasks]
   )
 
   const handleDeleteTask = useCallback(
     async (taskId) => {
       const target = tasksRef.current.find((task) => task.id === taskId)
-      if (!target) {
-        return
-      }
-      await cancelNotificationIfNeeded(target.notificationId)
+      if (!target) return
+
+      await cancelNotification(target.notificationId)
+
       try {
         await deleteTaskRecord(taskId)
       } catch (error) {
-        console.warn("Failed to delete task", error)
+        console.warn('Failed to delete task:', error)
       }
+
       const filtered = tasksRef.current.filter((task) => task.id !== taskId)
       const reindexed = reindexTasks(filtered)
+
       setTasks(reindexed)
-      await persistPositionsSafe(reindexed)
+      await savePositions(reindexed)
       setEditingTaskId((current) => (current === taskId ? null : current))
     },
-    [cancelNotificationIfNeeded, persistPositionsSafe, setTasks]
+    [cancelNotification, savePositions, setTasks]
   )
 
   const handleToggleComplete = useCallback(
     async (taskId, nextCompleted) => {
       const task = tasksRef.current.find((item) => item.id === taskId)
-      if (!task) {
-        return
-      }
+      if (!task) return
+
       let notificationId = task.notificationId
+
       if (nextCompleted) {
-        await cancelNotificationIfNeeded(notificationId)
+        await cancelNotification(notificationId)
         notificationId = null
-      } else if (
-        !notificationId &&
-        task.remindAt &&
-        (task.repeat || task.remindAt > Date.now())
-      ) {
-        notificationId = await scheduleNotificationForTask({
+      } else if (!notificationId && task.remindAt && (task.repeat || task.remindAt > Date.now())) {
+        notificationId = await scheduleNotification({
           taskId,
           body: task.value,
           remindAt: task.remindAt,
@@ -373,81 +339,73 @@ export const useTaskManager = () => {
         completedAt: nextCompleted ? Date.now() : null,
         notificationId,
       }
+
       await updateTaskRecord(taskId, patch)
+
       setTasks((prev) =>
-        prev.map((item) =>
-          item.id === taskId
-            ? {
-                ...item,
-                ...patch,
-              }
-            : item
-        )
+        prev.map((item) => (item.id === taskId ? { ...item, ...patch } : item))
       )
     },
-    [cancelNotificationIfNeeded, scheduleNotificationForTask, setTasks]
+    [cancelNotification, scheduleNotification, setTasks]
   )
 
-  const handleMoveTask = useCallback(
+  const moveTask = useCallback(
     async (taskId, direction) => {
       const current = tasksRef.current
       const index = current.findIndex((task) => task.id === taskId)
       const targetIndex = index + direction
+
       if (index === -1 || targetIndex < 0 || targetIndex >= current.length) {
         return
       }
+
       const next = [...current]
       const [moved] = next.splice(index, 1)
       next.splice(targetIndex, 0, moved)
+
       const reindexed = reindexTasks(next)
       setTasks(reindexed)
-      await persistPositionsSafe(reindexed)
+      await savePositions(reindexed)
     },
-    [persistPositionsSafe, setTasks]
+    [savePositions, setTasks]
   )
 
   const handleMoveUp = useCallback(
-    (taskId) => {
-      handleMoveTask(taskId, -1)
-    },
-    [handleMoveTask]
+    (taskId) => moveTask(taskId, -1),
+    [moveTask]
   )
 
   const handleMoveDown = useCallback(
-    (taskId) => {
-      handleMoveTask(taskId, 1)
-    },
-    [handleMoveTask]
+    (taskId) => moveTask(taskId, 1),
+    [moveTask]
   )
 
-  const handleSnoozeTask = useCallback(
+  const snoozeTask = useCallback(
     async (taskId, sourceContent) => {
       const task = tasksRef.current.find((item) => item.id === taskId)
-      if (!task) {
-        return
-      }
-      const snoozeUntil = Date.now() + FIFTEEN_MINUTES_MS
-      await cancelNotificationIfNeeded(task.notificationId)
+      if (!task) return
+
+      const snoozeUntil = Date.now() + TIME.SNOOZE_DURATION
+
+      await cancelNotification(task.notificationId)
+
       let notificationId = null
+
       try {
         notificationId = await Notifications.scheduleNotificationAsync({
           content: {
-            title: sourceContent?.title ?? "Reminder",
+            title: sourceContent?.title ?? 'Reminder',
             body: sourceContent?.body ?? task.value,
-            data: {
-              ...(sourceContent?.data || {}),
-              key: taskId,
-              snoozed: true,
-            },
-            categoryIdentifier: "task-reminder-actions",
+            data: { ...(sourceContent?.data || {}), key: taskId, snoozed: true },
+            categoryIdentifier: NOTIFICATION_CONFIG.CATEGORY_ID,
           },
           trigger: {
             date: snoozeUntil,
-            channelId: "reminders",
+            channelId: NOTIFICATION_CONFIG.CHANNEL_ID,
           },
         })
       } catch (error) {
-        console.warn("Failed to snooze notification", error)
+        console.warn('Failed to snooze notification:', error)
         return
       }
 
@@ -456,39 +414,31 @@ export const useTaskManager = () => {
         repeat: null,
         notificationId,
       }
+
       await updateTaskRecord(taskId, patch)
+
       setTasks((prev) =>
-        prev.map((item) =>
-          item.id === taskId
-            ? {
-                ...item,
-                ...patch,
-              }
-            : item
-        )
+        prev.map((item) => (item.id === taskId ? { ...item, ...patch } : item))
       )
+
       console.log(`Task ${taskId} snoozed for 15 minutes`)
     },
-    [cancelNotificationIfNeeded, setTasks]
+    [cancelNotification, setTasks]
   )
 
   const submitHandler = useCallback(
     async (rawValue, editingId = null, remindAtOverride = null) => {
-      const { cleanedText, remindAt, repeat, instructionMatched } =
-        parseReminderTokens(rawValue)
+      const { cleanedText, remindAt, repeat, instructionMatched } = parseReminderTokens(rawValue)
       const trimmedValue = cleanedText.trim()
-      if (!trimmedValue) {
-        return
-      }
+
+      if (!trimmedValue) return
+
       const normalizedOverride = normalizeRemindAt(remindAtOverride)
-      const normalizedRemindAt =
-        normalizedOverride != null
-          ? normalizedOverride
-          : normalizeRemindAt(remindAt)
+      const normalizedRemindAt = normalizedOverride ?? normalizeRemindAt(remindAt)
       const matched = instructionMatched || normalizedOverride != null
 
       if (editingId) {
-        await handleUpdateTask({
+        await updateTask({
           taskId: editingId,
           nextValue: trimmedValue,
           nextRemindAtRaw: normalizedRemindAt,
@@ -497,23 +447,24 @@ export const useTaskManager = () => {
         })
         return
       }
-      await handleCreateTask({
+
+      await createTask({
         value: trimmedValue,
         remindAt: normalizedRemindAt,
         repeat: repeat ?? null,
       })
     },
-    [handleCreateTask, handleUpdateTask]
+    [createTask, updateTask]
   )
 
-  const hydrateTasksAsync = useCallback(async () => {
+  const loadTasks = useCallback(async () => {
     try {
       await ensureStorageReady()
       const stored = await fetchTasks()
       const normalized = reindexTasks(stored)
       setTasks(normalized)
     } catch (error) {
-      console.warn("Failed to load tasks from storage", error)
+      console.warn('Failed to load tasks from storage:', error)
     } finally {
       setLoadingTasks(false)
     }
@@ -521,20 +472,21 @@ export const useTaskManager = () => {
 
   useEffect(() => {
     let mounted = true
+
     ensureNotificationsReady()
       .then((granted) => {
         if (mounted) {
           notificationsGrantedRef.current = granted
           if (!granted) {
-            console.warn("Notification permissions not granted")
+            console.warn('Notification permissions not granted')
           }
         }
       })
       .catch((error) => {
-        console.warn("Notification readiness failed", error)
+        console.warn('Notification readiness failed:', error)
       })
 
-    hydrateTasksAsync()
+    loadTasks()
 
     const subscription = Notifications.addNotificationResponseReceivedListener(
       async (response) => {
@@ -542,31 +494,26 @@ export const useTaskManager = () => {
         const taskKey = response?.notification?.request?.content?.data?.key
 
         if (!taskKey) {
-          console.log("Notification tapped without task context")
+          console.log('Notification tapped without task context')
           return
         }
 
-        if (actionIdentifier === Notifications.DEFAULT_ACTION_IDENTIFIER) {
-          console.log(`Reminder opened for task ${taskKey}`)
-          return
-        }
+        switch (actionIdentifier) {
+          case Notifications.DEFAULT_ACTION_IDENTIFIER:
+            console.log(`Reminder opened for task ${taskKey}`)
+            break
 
-        if (actionIdentifier === "DONE_ACTION") {
-          await handleToggleComplete(taskKey, true)
-          return
-        }
+          case NOTIFICATION_CONFIG.ACTIONS.DONE:
+            await handleToggleComplete(taskKey, true)
+            break
 
-        if (actionIdentifier === "SNOOZE_ACTION") {
-          await handleSnoozeTask(
-            taskKey,
-            response.notification.request.content
-          )
-          return
-        }
+          case NOTIFICATION_CONFIG.ACTIONS.SNOOZE:
+            await snoozeTask(taskKey, response.notification.request.content)
+            break
 
-        console.log(
-          `Unhandled notification action ${actionIdentifier} for task ${taskKey}`
-        )
+          default:
+            console.log(`Unhandled action: ${actionIdentifier} for task ${taskKey}`)
+        }
       }
     )
 
@@ -574,7 +521,7 @@ export const useTaskManager = () => {
       mounted = false
       subscription.remove()
     }
-  }, [handleSnoozeTask, handleToggleComplete, hydrateTasksAsync])
+  }, [handleToggleComplete, loadTasks, snoozeTask])
 
   const startEditing = useCallback((taskId) => {
     setEditingTaskId(taskId)
@@ -590,6 +537,7 @@ export const useTaskManager = () => {
     reminderCount,
     assistantInsights,
     editingTask,
+
     submitHandler,
     handleDeleteTask,
     handleToggleComplete,
